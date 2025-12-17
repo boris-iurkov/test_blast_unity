@@ -11,6 +11,7 @@ namespace Game
 		private void Awake()
 		{
 			_gameController = new GameController();
+			_gameController.Init();
 		}
 	}
 }
