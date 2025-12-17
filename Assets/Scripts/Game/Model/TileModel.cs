@@ -2,11 +2,11 @@ namespace Game.Model
 {
 	public class TileModel
 	{
-		private TileColor _color;
+		public TileColor Color { get; private set; }
 
 		public void SetColor(TileColor color)
 		{
-			_color = color;
+			Color = color;
 		}
 	}
 }

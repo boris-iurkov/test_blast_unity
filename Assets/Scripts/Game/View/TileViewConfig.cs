@@ -1,7 +1,7 @@
 using Game.Model;
 using UnityEngine;
 
-namespace Game.Config
+namespace Game.View
 {
 	[CreateAssetMenu(menuName = "Game/Tile View Config")]
 	public class TileViewConfig : ScriptableObject
