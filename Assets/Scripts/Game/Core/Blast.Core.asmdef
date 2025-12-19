@@ -1,0 +1,17 @@
+{
+    "name": "Blast.Core",
+    "rootNamespace": "",
+    "references": [
+        "Blast.Controller",
+        "Blast.View"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

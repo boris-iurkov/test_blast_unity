@@ -1,13 +1,15 @@
 using System;
-using Game.Model;
 using Random = UnityEngine.Random;
 
-namespace Game.Core
+namespace Game.Model
 {
 	public class Board
 	{
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
+
+		public int Width => _tiles.GetLength(0);
+		public int Height => _tiles.GetLength(1);
 
 		public void Init()
 		{
