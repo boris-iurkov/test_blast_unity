@@ -23,6 +23,7 @@ namespace Game.Controller
 			_gameFieldView = gameFieldView;
 			_gameFieldView.Init(
 				_gameField, 
+				tileViewLibrary,
 				tileViewPool,
 				tileWidth,
 				tileHeight);

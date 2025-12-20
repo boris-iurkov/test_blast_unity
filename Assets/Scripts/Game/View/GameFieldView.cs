@@ -8,6 +8,7 @@ namespace Game.View
 		[SerializeField] private RectTransform tilesParent;
 		
 		private GameField _gameField;
+		private TileViewLibrary _tileViewLibrary;
 		private TileView[,] _tiles;
 		private TileViewPool _tileViewPool;
 
@@ -16,11 +17,13 @@ namespace Game.View
 
 		public void Init(
 			GameField gameField, 
+			TileViewLibrary tileViewLibrary,
 			TileViewPool tileViewPool,
 			int tileWidth,
 			int tileHeight)
 		{
 			_gameField = gameField;
+			_tileViewLibrary = tileViewLibrary;
 			_tileViewPool = tileViewPool;
 			_tileWidth = tileWidth;
 			_tileHeight = tileHeight;
@@ -32,15 +35,22 @@ namespace Game.View
 
 		private void FillField()
 		{
-			for (var x = 0; x < _gameField.RowsCount; x++)
-			for (var y = 0; y < _gameField.ColumnsCount; y++)
-				CreateTile(x, y);
+			for (var x = 0; x < _gameField.Tiles.GetLength(0); x++)
+			{
+				for (var y = 0; y < _gameField.Tiles.GetLength(1); y++)
+				{
+					TileModel tile = _gameField.Tiles[x, y];
+					Sprite sprite = _tileViewLibrary.GetSprite(tile.Color);
+					CreateTile(sprite, tile.X, tile.Y);
+				}
+			}
 		}
 
-		private void CreateTile(int x, int y)
+		private void CreateTile(Sprite sprite, int x, int y)
 		{
 			TileView tileView = _tileViewPool.GetTile();
 			tileView.transform.SetParent(tilesParent, false);
+			tileView.SetSprite(sprite);
 			tileView.RectTransform.anchoredPosition = CalculateTilePosition(x, y);
 			_tiles[x, y] = tileView;
 		}

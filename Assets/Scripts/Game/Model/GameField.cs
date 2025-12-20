@@ -8,6 +8,7 @@ namespace Game.Model
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
 
+		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
 		public int ColumnsCount { get; private set; }
 
@@ -35,6 +36,7 @@ namespace Game.Model
 				{
 					var tile = new TileModel();
 					tile.SetColor(GetRandomTileColor());
+					tile.SetPositions(row, column);
 
 					_tiles[row, column] = tile;
 				}
