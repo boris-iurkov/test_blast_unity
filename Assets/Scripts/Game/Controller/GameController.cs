@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Game.Model;
 using Game.View;
 using UnityEngine;
@@ -33,7 +34,9 @@ namespace Game.Controller
 
 		private void HandleTileClick(int row, int column)
 		{
-			TileModel tile = _gameField.GetTile(row, column);
+			List<Vector2Int> group = _gameField.GetTileGroup(row, column);
+			if (group.Count < 2)
+				return;
 		}
 	}
 }
