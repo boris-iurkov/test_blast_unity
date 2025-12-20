@@ -1587,6 +1587,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Blast.Core::Game.Core.GameEntry
   gameFieldView: {fileID: 1003125348}
+  gameConfig: {fileID: 11400000, guid: b77d3e0a4b7f0e842bf393a59e98d27d, type: 2}
+  tileViewLibrary: {fileID: 11400000, guid: e9b3903b11eaeb145b9dc76a7dc7668d, type: 2}
 --- !u!4 &2133474010
 Transform:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ namespace Game.Core
 	{
 		[SerializeField] private GameFieldView gameFieldView;
 		[SerializeField] private GameConfig gameConfig;
+		[SerializeField] private TileViewLibrary tileViewLibrary;
 
 		private GameController _gameController;
 
