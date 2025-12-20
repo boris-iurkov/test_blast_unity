@@ -5,15 +5,49 @@ namespace Game.View
 {
 	public class GameFieldView : MonoBehaviour
 	{
+		[SerializeField] private RectTransform tilesParent;
+		
 		private GameField _gameField;
 		private TileView[,] _tiles;
 		private TileViewPool _tileViewPool;
 
-		public void Init(GameField gameField, TileViewPool tileViewPool)
+		private int _tileWidth;
+		private int _tileHeight;
+
+		public void Init(
+			GameField gameField, 
+			TileViewPool tileViewPool,
+			int tileWidth,
+			int tileHeight)
 		{
 			_gameField = gameField;
-			_tiles = new TileView[_gameField.Width, _gameField.Height];
 			_tileViewPool = tileViewPool;
+			_tileWidth = tileWidth;
+			_tileHeight = tileHeight;
+			
+			_tiles = new TileView[_gameField.RowsCount, _gameField.ColumnsCount];
+			
+			FillField();
+		}
+
+		private void FillField()
+		{
+			for (var x = 0; x < _gameField.RowsCount; x++)
+			for (var y = 0; y < _gameField.ColumnsCount; y++)
+				CreateTile(x, y);
+		}
+
+		private void CreateTile(int x, int y)
+		{
+			TileView tileView = _tileViewPool.GetTile();
+			tileView.transform.SetParent(tilesParent, false);
+			tileView.RectTransform.anchoredPosition = CalculateTilePosition(x, y);
+			_tiles[x, y] = tileView;
+		}
+
+		private Vector2 CalculateTilePosition(int x, int y)
+		{
+			return new Vector2(_tileWidth * y, _tileHeight * x);
 		}
 	}
 }

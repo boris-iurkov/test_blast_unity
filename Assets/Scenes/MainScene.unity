@@ -993,9 +993,8 @@ GameObject:
   - component: {fileID: 1003125345}
   - component: {fileID: 1003125347}
   - component: {fileID: 1003125346}
-  - component: {fileID: 1003125348}
   m_Layer: 5
-  m_Name: GameField
+  m_Name: GamePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1012,7 +1011,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1757941690}
   m_Father: {fileID: 419217259}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1058,18 +1058,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1003125344}
   m_CullTransparentMesh: 1
---- !u!114 &1003125348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1003125344}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a75547272ff241c5957bd8acbdcd57c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Blast.View::Game.View.BoardView
 --- !u!1 &1091673184
 GameObject:
   m_ObjectHideFlags: 0
@@ -1473,6 +1461,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1757941689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1757941690}
+  - component: {fileID: 1757941691}
+  m_Layer: 5
+  m_Name: GameField
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1757941690
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757941689}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1003125345}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 40, y: 1070}
+  m_SizeDelta: {x: 900, y: 1000}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1757941691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757941689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a75547272ff241c5957bd8acbdcd57c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Blast.View::Game.View.GameFieldView
+  tilesParent: {fileID: 1757941690}
 --- !u!1 &2101027709
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,7 +1676,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Blast.Core::Game.Core.GameEntry
   gameConfig: {fileID: 11400000, guid: b77d3e0a4b7f0e842bf393a59e98d27d, type: 2}
-  gameFieldView: {fileID: 1003125348}
+  gameFieldView: {fileID: 1757941691}
   tileViewLibrary: {fileID: 11400000, guid: e9b3903b11eaeb145b9dc76a7dc7668d, type: 2}
   tileViewPool: {fileID: 359600685}
 --- !u!4 &2133474010

@@ -7,6 +7,8 @@ namespace Game.Model.Config
 	{
 		public int RowsCount;
 		public int ColumnsCount;
+		public int TileWidth;
+		public int TileHeight;
 		public int TargetScore;
 		public int MaxMoves;
 	}

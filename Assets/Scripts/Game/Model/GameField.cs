@@ -8,16 +8,13 @@ namespace Game.Model
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
 
-		private int _rowsCount;
-		private int _columnsCount;
-
-		public int Width => _tiles.GetLength(0);
-		public int Height => _tiles.GetLength(1);
+		public int RowsCount { get; private set; }
+		public int ColumnsCount { get; private set; }
 
 		public void Init(int rowsCount, int columnsCount)
 		{
-			_rowsCount = rowsCount;
-			_columnsCount = columnsCount;
+			RowsCount = rowsCount;
+			ColumnsCount = columnsCount;
 			
 			InitSourceColors();
 			InitStartTiles();
@@ -30,11 +27,11 @@ namespace Game.Model
 
 		private void InitStartTiles()
 		{
-			_tiles = new TileModel[_rowsCount, _columnsCount];
+			_tiles = new TileModel[RowsCount, ColumnsCount];
 			
-			for (var row = 0; row < _rowsCount; row++)
+			for (var row = 0; row < RowsCount; row++)
 			{
-				for (var column = 0; column < _columnsCount; column++)
+				for (var column = 0; column < ColumnsCount; column++)
 				{
 					var tile = new TileModel();
 					tile.SetColor(GetRandomTileColor());

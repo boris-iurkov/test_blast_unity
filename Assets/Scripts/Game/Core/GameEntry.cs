@@ -21,7 +21,14 @@ namespace Game.Core
 		private void Awake()
 		{
 			_gameController = new GameController();
-			_gameController.Init(gameFieldView, tileViewPool, gameConfig.RowsCount, gameConfig.ColumnsCount);
+			_gameController.Init(
+				gameFieldView, 
+				tileViewLibrary, 
+				tileViewPool, 
+				gameConfig.RowsCount, 
+				gameConfig.ColumnsCount,
+				gameConfig.TileWidth,
+				gameConfig.TileHeight);
 		}
 	}
 }
