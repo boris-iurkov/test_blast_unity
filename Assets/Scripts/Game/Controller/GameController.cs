@@ -8,10 +8,10 @@ namespace Game.Controller
 		private GameField _gameField;
 		private GameFieldView _gameFieldView;
 
-		public void Init(GameFieldView gameFieldView)
+		public void Init(GameFieldView gameFieldView, int rowsCount, int columnsCount)
 		{
 			_gameField = new GameField();
-			_gameField.Init();
+			_gameField.Init(rowsCount, columnsCount);
 			
 			_gameFieldView = gameFieldView;
 			_gameFieldView.Init(_gameField);

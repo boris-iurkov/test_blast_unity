@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Game.Model;
+using Game.View.Config;
 using UnityEngine;
 
 namespace Game.View
