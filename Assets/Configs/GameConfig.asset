@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4bd81dddf75423688ab5e50a9176fa8, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: Blast.Model::Game.Model.Config.GameConfig
-  RowsCount: 9
-  ColumnsCount: 9
-  TileWidth: 100
-  TileHeight: 105
-  TargetScore: 1000
-  MaxMoves: 20
+  rowsCount: 9
+  columnsCount: 9
+  tileWidth: 100
+  tileHeight: 105
+  targetScore: 1000
+  maxMoves: 20

@@ -25,10 +25,10 @@ namespace Game.Core
 				gameFieldView, 
 				tileViewLibrary, 
 				tileViewPool, 
-				gameConfig.RowsCount, 
-				gameConfig.ColumnsCount,
-				gameConfig.TileWidth,
-				gameConfig.TileHeight);
+				gameConfig.rowsCount, 
+				gameConfig.columnsCount,
+				gameConfig.tileWidth,
+				gameConfig.tileHeight);
 		}
 	}
 }
