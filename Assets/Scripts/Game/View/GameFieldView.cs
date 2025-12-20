@@ -1,3 +1,4 @@
+using System;
 using Game.Model;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace Game.View
 	public class GameFieldView : MonoBehaviour
 	{
 		[SerializeField] private RectTransform tilesParent;
+
+		public event Action<int, int> OnTileClickRequested;
 		
 		private GameField _gameField;
 		private TileViewLibrary _tileViewLibrary;
@@ -35,29 +38,42 @@ namespace Game.View
 
 		private void FillField()
 		{
-			for (var x = 0; x < _gameField.Tiles.GetLength(0); x++)
+			int rows = _gameField.Tiles.GetLength(0);
+			int columns = _gameField.Tiles.GetLength(1);
+			
+			for (var row = 0; row < rows; row++)
 			{
-				for (var y = 0; y < _gameField.Tiles.GetLength(1); y++)
+				for (var column = 0; column < columns; column++)
 				{
-					TileModel tile = _gameField.Tiles[x, y];
+					TileModel tile = _gameField.Tiles[row, column];
 					Sprite sprite = _tileViewLibrary.GetSprite(tile.Color);
-					CreateTile(sprite, tile.X, tile.Y);
+					CreateTile(sprite, tile.Row, tile.Column);
 				}
 			}
 		}
 
-		private void CreateTile(Sprite sprite, int x, int y)
+		private void CreateTile(Sprite sprite, int row, int column)
 		{
 			TileView tileView = _tileViewPool.GetTile();
 			tileView.transform.SetParent(tilesParent, false);
+			tileView.RectTransform.anchoredPosition = CalculateTilePosition(row, column);
+			
 			tileView.SetSprite(sprite);
-			tileView.RectTransform.anchoredPosition = CalculateTilePosition(x, y);
-			_tiles[x, y] = tileView;
+			tileView.SetPositions(row, column);
+
+			tileView.Clicked += OnTileClicked;
+			
+			_tiles[row, column] = tileView;
 		}
 
-		private Vector2 CalculateTilePosition(int x, int y)
+		private Vector2 CalculateTilePosition(int row, int column)
 		{
-			return new Vector2(_tileWidth * y, _tileHeight * x);
+			return new Vector2(_tileWidth * column, _tileHeight * row);
+		}
+
+		private void OnTileClicked(int row, int column)
+		{
+			OnTileClickRequested?.Invoke(row, column);
 		}
 	}
 }

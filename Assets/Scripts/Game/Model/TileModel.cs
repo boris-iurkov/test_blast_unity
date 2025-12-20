@@ -3,18 +3,18 @@ namespace Game.Model
 	public class TileModel
 	{
 		public TileColor Color { get; private set; }
-		public int X { get; private set; }
-		public int Y { get; private set; }
+		public int Row { get; private set; }
+		public int Column { get; private set; }
 
 		public void SetColor(TileColor color)
 		{
 			Color = color;
 		}
 
-		public void SetPositions(int x, int y)
+		public void SetPositions(int row, int column)
 		{
-			X = x;
-			Y = y;
+			Row = row;
+			Column = column;
 		}
 	}
 }

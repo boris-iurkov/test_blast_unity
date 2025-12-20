@@ -21,6 +21,11 @@ namespace Game.Model
 			InitStartTiles();
 		}
 
+		public TileModel GetTile(int row, int column)
+		{
+			return _tiles[row, column];
+		}
+
 		private void InitSourceColors()
 		{
 			_sourceColors = (TileColor[])Enum.GetValues(typeof(TileColor));
