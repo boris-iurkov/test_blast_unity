@@ -5,11 +5,11 @@ namespace Game.View
 {
 	public class TileView : MonoBehaviour
 	{
-		[SerializeField] private Image _image;
+		[SerializeField] private Image image;
 
 		public void SetSprite(Sprite sprite)
 		{
-			_image.sprite = sprite;
+			image.sprite = sprite;
 		}
 	}
 }

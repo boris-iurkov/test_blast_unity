@@ -5,13 +5,15 @@ namespace Game.View
 {
 	public class GameFieldView : MonoBehaviour
 	{
-		private TileView[,] _tiles;
 		private GameField _gameField;
+		private TileView[,] _tiles;
+		private TileViewPool _tileViewPool;
 
-		public void Init(GameField gameField)
+		public void Init(GameField gameField, TileViewPool tileViewPool)
 		{
 			_gameField = gameField;
 			_tiles = new TileView[_gameField.Width, _gameField.Height];
+			_tileViewPool = tileViewPool;
 		}
 	}
 }
