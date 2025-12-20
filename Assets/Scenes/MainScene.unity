@@ -1586,7 +1586,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354d1c414382407b871e50aec8d1f302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Blast.Core::Game.Core.GameEntry
-  boardView: {fileID: 1003125348}
+  gameFieldView: {fileID: 1003125348}
 --- !u!4 &2133474010
 Transform:
   m_ObjectHideFlags: 0

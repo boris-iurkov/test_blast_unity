@@ -6,14 +6,14 @@ namespace Game.Core
 {
 	public class GameEntry : MonoBehaviour
 	{
-		[SerializeField] private BoardView boardView;
+		[SerializeField] private GameFieldView gameFieldView;
 		
 		private GameController _gameController;
 
 		private void Awake()
 		{
 			_gameController = new GameController();
-			_gameController.Init(boardView);
+			_gameController.Init(gameFieldView);
 		}
 	}
 }

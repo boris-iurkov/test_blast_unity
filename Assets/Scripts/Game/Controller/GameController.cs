@@ -5,16 +5,16 @@ namespace Game.Controller
 {
 	public class GameController
 	{
-		private Board _board;
-		private BoardView _boardView;
+		private GameField _gameField;
+		private GameFieldView _gameFieldView;
 
-		public void Init(BoardView boardView)
+		public void Init(GameFieldView gameFieldView)
 		{
-			_board = new Board();
-			_board.Init();
+			_gameField = new GameField();
+			_gameField.Init();
 			
-			_boardView = boardView;
-			_boardView.Init(_board);
+			_gameFieldView = gameFieldView;
+			_gameFieldView.Init(_gameField);
 		}
 	}
 }

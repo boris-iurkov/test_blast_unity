@@ -3,7 +3,7 @@ using Random = UnityEngine.Random;
 
 namespace Game.Model
 {
-	public class Board
+	public class GameField
 	{
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
@@ -24,8 +24,8 @@ namespace Game.Model
 
 		private void InitStartTiles()
 		{
-			int rows = GameConfig.BoardRows;
-			int columns = GameConfig.BoardColumns;
+			int rows = GameConfig.GameFieldRowsCount;
+			int columns = GameConfig.GameFieldColumnsCount;
 			
 			_tiles = new TileModel[rows, columns];
 			
