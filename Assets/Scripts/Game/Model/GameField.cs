@@ -77,6 +77,10 @@ namespace Game.Model
 				return;
 
 			TileModel tile = _tiles[row, column];
+			
+			if (tile == null)
+				return;
+			
 			if (tile.Color != targetColor)
 				return;
 
