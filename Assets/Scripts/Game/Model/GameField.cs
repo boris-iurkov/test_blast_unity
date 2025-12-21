@@ -23,11 +23,6 @@ namespace Game.Model
 			InitStartTiles();
 		}
 
-		public TileModel GetTile(int row, int column)
-		{
-			return _tiles[row, column];
-		}
-
 		public List<Vector2Int> GetTileGroup(int row, int column)
 		{
 			var result = new List<Vector2Int>();
@@ -37,6 +32,12 @@ namespace Game.Model
 			AddNeighborTiles(row, column, startTile.Color, visited, result);
 
 			return result;
+		}
+
+		public void RemoveTileGroup(List<Vector2Int> group)
+		{
+			foreach (Vector2Int positions in group)
+				_tiles[positions.x, positions.y] = null;
 		}
 
 		private void InitSourceColors()

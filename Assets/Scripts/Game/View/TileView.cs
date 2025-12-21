@@ -15,6 +15,7 @@ namespace Game.View
 
 		private int _row;
 		private int _column;
+		private bool _clickable = true;
 
 		public void SetSprite(Sprite sprite)
 		{
@@ -26,9 +27,17 @@ namespace Game.View
 			_row = row;
 			_column = column;
 		}
+		
+		public void SetClickable(bool clickable)
+		{
+			_clickable = clickable;
+		}
 
 		public void OnPointerClick(PointerEventData eventData)
 		{
+			if (!_clickable)
+				return;
+			
 			Clicked?.Invoke(_row, _column);
 		}
 	}

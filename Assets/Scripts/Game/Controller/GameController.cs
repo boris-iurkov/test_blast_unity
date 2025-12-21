@@ -37,6 +37,9 @@ namespace Game.Controller
 			List<Vector2Int> group = _gameField.GetTileGroup(row, column);
 			if (group.Count < 2)
 				return;
+			
+			_gameField.RemoveTileGroup(group);
+			_gameFieldView.RemoveTileGroup(group);
 		}
 	}
 }

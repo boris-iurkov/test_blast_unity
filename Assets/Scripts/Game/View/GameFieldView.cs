@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Game.Model;
 using UnityEngine;
 
@@ -34,6 +35,17 @@ namespace Game.View
 			_tiles = new TileView[_gameField.RowsCount, _gameField.ColumnsCount];
 			
 			FillField();
+		}
+
+		public void RemoveTileGroup(List<Vector2Int> group)
+		{
+			foreach (Vector2Int positions in group)
+			{
+				TileView tile = _tiles[positions.x, positions.y];
+				tile.SetClickable(false);
+				_tileViewPool.ReturnTile(tile);
+				_tiles[positions.x, positions.y] = null;
+			}
 		}
 
 		private void FillField()

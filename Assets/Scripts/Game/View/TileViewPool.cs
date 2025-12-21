@@ -32,6 +32,7 @@ namespace Game.View
 
 		public void ReturnTile(TileView tile)
 		{
+			tile.transform.SetParent(tilesContainer);
 			tile.gameObject.SetActive(false);
 			_stack.Push(tile);
 		}
