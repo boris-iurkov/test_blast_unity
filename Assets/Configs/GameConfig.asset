@@ -16,5 +16,7 @@ MonoBehaviour:
   columnsCount: 9
   tileWidth: 100
   tileHeight: 105
-  targetScore: 1000
+  gameFieldWidth: 900
+  gameFieldHeight: 1000
+  targetScore: 500
   maxMoves: 20

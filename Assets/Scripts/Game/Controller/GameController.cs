@@ -17,7 +17,9 @@ namespace Game.Controller
 			int rowsCount, 
 			int columnsCount,
 			int tileWidth,
-			int tileHeight)
+			int tileHeight,
+			int gameFieldWidth,
+			int gameFieldHeight)
 		{
 			_gameField = new GameField();
 			_gameField.Init(rowsCount, columnsCount);
@@ -28,7 +30,9 @@ namespace Game.Controller
 				tileViewLibrary,
 				tileViewPool,
 				tileWidth,
-				tileHeight);
+				tileHeight,
+				gameFieldWidth,
+				gameFieldHeight);
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 		}
 

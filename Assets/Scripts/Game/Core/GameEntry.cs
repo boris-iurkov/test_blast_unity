@@ -28,7 +28,9 @@ namespace Game.Core
 				gameConfig.rowsCount, 
 				gameConfig.columnsCount,
 				gameConfig.tileWidth,
-				gameConfig.tileHeight);
+				gameConfig.tileHeight,
+				gameConfig.gameFieldWidth,
+				gameConfig.gameFieldHeight);
 		}
 	}
 }
