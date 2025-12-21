@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Game.Model;
+using Game.Model.Data;
 using Game.View.Animation;
 using UnityEngine;
 
@@ -10,7 +11,8 @@ namespace Game.View
 	public class GameFieldView : MonoBehaviour
 	{
 		[SerializeField] private RectTransform tilesParent;
-		[SerializeField] private RemoveTileAnimationSettings removeAnimation;
+		[SerializeField] private RemoveAnimationSettings removeAnimationSettings;
+		[SerializeField] private FallAnimationSettings fallAnimationSettings;
 
 		public event Action<int, int> OnTileClickRequested;
 		
@@ -23,6 +25,8 @@ namespace Game.View
 		private int _tileHeight;
 		private int _gameFieldWidth;
 		private int _gameFieldHeight;
+		
+		private readonly HashSet<Vector2Int> _fallingTiles = new();
 
 		public void Init(
 			GameField gameField, 
@@ -56,7 +60,47 @@ namespace Game.View
 				RemoveTile(tile);
 			}
 		}
+
+		public void ApplyFallTiles(List<TileFallData> fallTiles)
+		{
+			int maxRow = _gameField.RowsCount - 1;
+			
+			foreach (TileFallData fallTile in fallTiles)
+			{
+				TileView tile = _tiles[fallTile.From.x, fallTile.From.y];
+				Vector2 from = CalculateTilePosition(fallTile.From.x, fallTile.From.y);
+				Vector2 to = CalculateTilePosition(fallTile.To.x, fallTile.To.y);
+				
+				float distance = Vector2.Distance(from, to);
+				float duration = distance / fallAnimationSettings.speed;
+				float delay = fallAnimationSettings.startDelay + (maxRow > 0 ? (float)fallTile.From.x / maxRow * fallAnimationSettings.cascadeDelayRange : 0f);
+				
+				_tiles[fallTile.From.x, fallTile.From.y] = null;
+				_tiles[fallTile.To.x, fallTile.To.y] = tile;
+				
+				tile.SetPositions(fallTile.To.x, fallTile.To.y);
+				
+				_fallingTiles.Add(fallTile.To);
+				
+				tile.SetClickable(false);
+				
+				tile.RectTransform
+					.DOLocalMove(new Vector3(to.x, to.y), duration)
+					.SetDelay(delay)
+					.SetEase(fallAnimationSettings.ease)
+					.OnComplete(() =>
+					{
+						_fallingTiles.Remove(fallTile.To);
+						tile.SetClickable(true);
+					});
+			}
+		}
 		
+		public bool IsTileFalling(int row, int column)
+		{
+			return _fallingTiles.Contains(new Vector2Int(row, column));
+		}
+
 		private void RemoveTile(TileView tile)
 		{
 			Transform tileTransform = tile.transform;
@@ -64,12 +108,12 @@ namespace Game.View
 
 			Sequence sequence = DOTween.Sequence();
 			sequence.Append(
-				tileTransform.DOScale(removeAnimation.scaleUp, removeAnimation.scaleUpDuration)
-					.SetEase(removeAnimation.scaleUpEase)
+				tileTransform.DOScale(removeAnimationSettings.scaleUp, removeAnimationSettings.scaleUpDuration)
+					.SetEase(removeAnimationSettings.scaleUpEase)
 			);
 			sequence.Append(
-				tileTransform.DOScale(0f, removeAnimation.scaleDownDuration)
-					.SetEase(removeAnimation.scaleDownEase)
+				tileTransform.DOScale(0f, removeAnimationSettings.scaleDownDuration)
+					.SetEase(removeAnimationSettings.scaleDownEase)
 			);
 			sequence.OnComplete(() =>
 			{
@@ -116,6 +160,9 @@ namespace Game.View
 
 		private void OnTileClicked(int row, int column)
 		{
+			if (IsTileFalling(row, column))
+				return;
+				
 			OnTileClickRequested?.Invoke(row, column);
 		}
 	}

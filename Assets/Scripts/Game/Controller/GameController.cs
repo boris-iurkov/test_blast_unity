@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Game.Model;
+using Game.Model.Data;
 using Game.View;
 using UnityEngine;
 
@@ -38,12 +39,27 @@ namespace Game.Controller
 
 		private void HandleTileClick(int row, int column)
 		{
+			if (_gameFieldView.IsTileFalling(row, column))
+				return;
+			
 			List<Vector2Int> group = _gameField.GetTileGroup(row, column);
+			
+			var groupWithoutFallingTiles = new List<Vector2Int>();
+			foreach (Vector2Int pos in group)
+			{
+				if (!_gameFieldView.IsTileFalling(pos.x, pos.y))
+					groupWithoutFallingTiles.Add(pos);
+			}
+			group = groupWithoutFallingTiles;
+			
 			if (group.Count < 2)
 				return;
 			
 			_gameField.RemoveTileGroup(group);
 			_gameFieldView.RemoveTileGroup(group);
+
+			List<TileFallData> fallTiles = _gameField.ApplyFallTiles();
+			_gameFieldView.ApplyFallTiles(fallTiles);
 		}
 	}
 }

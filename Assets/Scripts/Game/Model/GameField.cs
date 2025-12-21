@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Model.Data;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -38,6 +39,44 @@ namespace Game.Model
 		{
 			foreach (Vector2Int positions in group)
 				_tiles[positions.x, positions.y] = null;
+		}
+
+		public List<TileFallData> ApplyFallTiles()
+		{
+			var result = new List<TileFallData>();
+
+			for (var column = 0; column < ColumnsCount; column++)
+			{
+				var emptyTiles = 0;
+				
+				for (var row = 0; row < RowsCount; row++)
+				{
+					if (_tiles[row, column] == null)
+					{
+						emptyTiles++;
+						continue;
+					}
+
+					if (emptyTiles > 0)
+					{
+						TileModel tile = _tiles[row, column];
+						var from = new Vector2Int(row, column);
+						var to = new Vector2Int(row - emptyTiles, column);
+
+						_tiles[row, column] = null;
+						_tiles[row - emptyTiles, column] = tile;
+
+						result.Add(new TileFallData
+						{
+							Tile = tile, 
+							From = from, 
+							To = to
+						});
+					}
+				}
+			}
+			
+			return result;
 		}
 
 		private void InitSourceColors()

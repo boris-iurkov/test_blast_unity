@@ -3,7 +3,7 @@ using DG.Tweening;
 namespace Game.View.Animation
 {
 	[System.Serializable]
-	public class RemoveTileAnimationSettings
+	public class RemoveAnimationSettings
 	{
 		public float scaleUp = 1.2f;
 		public float scaleUpDuration = 0.12f;
