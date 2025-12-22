@@ -26,6 +26,13 @@ namespace Game.Model
 			FireScoreChanged();
 		}
 		
+		public void Reset()
+		{
+			Score = 0;
+			
+			FireScoreChanged();
+		}
+		
 		private int GetScorePerTile(int groupSize)
 		{
 			if (groupSize < 1)

@@ -98,11 +98,6 @@ namespace Game.Controller
 			_gameFieldView.UpdateScoreCount(score, targetScore);
 		}
 
-		private void HandleEndGamePopupButtonClicked()
-		{
-			_endGamePopup.Hide(() => _endGamePopup.gameObject.SetActive(false));
-		}
-
 		private void CheckEndGame()
 		{
 			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
@@ -139,6 +134,24 @@ namespace Game.Controller
 		{
 			_endGamePopup.gameObject.SetActive(true);
 			_endGamePopup.Show(_endGameResult == EndGameResult.Win);
+		}
+		
+		private void HandleEndGamePopupButtonClicked()
+		{
+			_endGamePopup.Hide(() =>
+			{
+				_endGamePopup.gameObject.SetActive(false);
+				RestartGame();
+			});
+		}
+
+		private void RestartGame()
+		{
+			_isEndGame = false;
+			_endGameResult = EndGameResult.None;
+			
+			_movesCounter.Reset();
+			_scoreCounter.Reset();
 		}
 	}
 }

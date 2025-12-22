@@ -27,6 +27,13 @@ namespace Game.Model
 			FireMovesChanged();
 		}
 
+		public void Reset()
+		{
+			MovesLeft = MaxMoves;
+			
+			FireMovesChanged();
+		}
+
 		private void FireMovesChanged()
 		{
 			OnMovesChanged?.Invoke(MovesLeft);
