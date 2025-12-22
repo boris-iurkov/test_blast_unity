@@ -59,7 +59,7 @@ namespace Game.Controller
 			_gameFieldView.RemoveTileGroup(group);
 
 			List<TileFallData> fallTiles = _gameField.ApplyFallTiles();
-			_gameFieldView.ApplyFallTiles(fallTiles);
+			_gameFieldView.FallTiles(fallTiles);
 		}
 	}
 }

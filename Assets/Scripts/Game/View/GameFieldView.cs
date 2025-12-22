@@ -61,29 +61,45 @@ namespace Game.View
 			}
 		}
 
-		public void ApplyFallTiles(List<TileFallData> fallTiles)
+		public void FallTiles(List<TileFallData> fallTiles)
 		{
 			int maxRow = _gameField.RowsCount - 1;
-			
+
 			foreach (TileFallData fallTile in fallTiles)
 			{
-				TileView tile = _tiles[fallTile.From.x, fallTile.From.y];
-				Vector2 from = CalculateTilePosition(fallTile.From.x, fallTile.From.y);
+				TileView tile;
+
+				bool isNewTile = fallTile.From.x >= _gameField.RowsCount;
+
+				if (isNewTile)
+				{
+					tile = CreateTile(fallTile.Tile);
+					tile.RectTransform.anchoredPosition = CalculateTilePosition(fallTile.From.x, fallTile.From.y);
+				}
+				else
+				{
+					tile = _tiles[fallTile.From.x, fallTile.From.y];
+					_tiles[fallTile.From.x, fallTile.From.y] = null;
+				}
+
 				Vector2 to = CalculateTilePosition(fallTile.To.x, fallTile.To.y);
-				
-				float distance = Vector2.Distance(from, to);
+
+				float distance = Vector2.Distance(tile.RectTransform.localPosition, to);
 				float duration = distance / fallTileAnimationConfig.speed;
-				float delay = fallTileAnimationConfig.startDelay + (maxRow > 0 ? (float)fallTile.From.x / maxRow * fallTileAnimationConfig.cascadeDelayRange : 0f);
-				
-				_tiles[fallTile.From.x, fallTile.From.y] = null;
+
+				float delay =
+					fallTileAnimationConfig.startDelay +
+					(maxRow > 0
+						? (float)fallTile.To.x / maxRow * fallTileAnimationConfig.cascadeDelayRange
+						: 0f);
+
 				_tiles[fallTile.To.x, fallTile.To.y] = tile;
-				
+
 				tile.SetPositions(fallTile.To.x, fallTile.To.y);
-				
-				_fallingTiles.Add(fallTile.To);
-				
 				tile.SetClickable(false);
-				
+
+				_fallingTiles.Add(fallTile.To);
+
 				tile.RectTransform
 					.DOLocalMove(new Vector3(to.x, to.y), duration)
 					.SetDelay(delay)
@@ -131,24 +147,29 @@ namespace Game.View
 				for (var column = 0; column < columns; column++)
 				{
 					TileModel tile = _gameField.Tiles[row, column];
-					Sprite sprite = _tileViewLibrary.GetSprite(tile.Color);
-					CreateTile(sprite, tile.Row, tile.Column);
+					TileView tileView = CreateTile(tile);
+					tileView.RectTransform.anchoredPosition = CalculateTilePosition(row, column);
 				}
 			}
 		}
 
-		private void CreateTile(Sprite sprite, int row, int column)
+		private TileView CreateTile(TileModel tile)
 		{
+			Sprite sprite = _tileViewLibrary.GetSprite(tile.Color);
+			int row = tile.Row;
+			int column = tile.Column;
+			
 			TileView tileView = _tileViewPool.GetTile();
 			tileView.transform.SetParent(tilesParent, false);
-			tileView.RectTransform.anchoredPosition = CalculateTilePosition(row, column);
-			
+
 			tileView.SetSprite(sprite);
 			tileView.SetPositions(row, column);
 
 			tileView.Clicked += OnTileClicked;
 			
 			_tiles[row, column] = tileView;
+
+			return tileView;
 		}
 
 		private Vector2 CalculateTilePosition(int row, int column)

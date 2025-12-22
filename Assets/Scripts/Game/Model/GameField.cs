@@ -60,11 +60,12 @@ namespace Game.Model
 					if (emptyTiles > 0)
 					{
 						TileModel tile = _tiles[row, column];
+						
 						var from = new Vector2Int(row, column);
 						var to = new Vector2Int(row - emptyTiles, column);
 
 						_tiles[row, column] = null;
-						_tiles[row - emptyTiles, column] = tile;
+						_tiles[to.x, to.y] = tile;
 
 						result.Add(new TileFallData
 						{
@@ -73,6 +74,22 @@ namespace Game.Model
 							To = to
 						});
 					}
+				}
+				
+				for (var i = 0; i < emptyTiles; i++)
+				{
+					int targetRow = RowsCount - emptyTiles + i;
+					int spawnRow = RowsCount + i + 1;
+
+					TileModel newTile = GetTileModel(targetRow, column);
+					_tiles[targetRow, column] = newTile;
+
+					result.Add(new TileFallData
+					{
+						Tile = newTile,
+						From = new Vector2Int(spawnRow, column),
+						To = new Vector2Int(targetRow, column)
+					});
 				}
 			}
 			
@@ -92,13 +109,18 @@ namespace Game.Model
 			{
 				for (var column = 0; column < ColumnsCount; column++)
 				{
-					var tile = new TileModel();
-					tile.SetColor(GetRandomTileColor());
-					tile.SetPositions(row, column);
-
+					TileModel tile = GetTileModel(row, column);
 					_tiles[row, column] = tile;
 				}
 			}
+		}
+
+		private TileModel GetTileModel(int row, int column)
+		{
+			var tile = new TileModel();
+			tile.SetColor(GetRandomTileColor());
+			tile.SetPositions(row, column);
+			return tile;
 		}
 
 		private TileColor GetRandomTileColor()
