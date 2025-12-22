@@ -4,6 +4,8 @@ using Game.Model.Data;
 using Game.View;
 using Game.View.Config;
 using Game.View.Data;
+using Game.View.Popup;
+using Game.View.Tile;
 using UnityEngine;
 
 namespace Game.Core
@@ -15,6 +17,7 @@ namespace Game.Core
 		
 		[Space]
 		[SerializeField] private GameFieldView gameFieldView;
+		[SerializeField] private EndGamePopup endGamePopup;
 		
 		[Space]
 		[SerializeField] private TileViewLibrary tileViewLibrary;
@@ -43,6 +46,7 @@ namespace Game.Core
 			_gameController = new GameController();
 			_gameController.Init(
 				gameFieldView, 
+				endGamePopup,
 				tileViewLibrary, 
 				tileViewPool, 
 				gameConfigData,

@@ -6,6 +6,7 @@ using Game.Model;
 using Game.Model.Data;
 using Game.View.Config;
 using Game.View.Data;
+using Game.View.Tile;
 using TMPro;
 using UnityEngine;
 
@@ -22,6 +23,7 @@ namespace Game.View
 		[SerializeField] private TextMeshProUGUI labelScore;
 
 		public event Action<int, int> OnTileClickRequested;
+		public event Action FallCompleted;
 		
 		private GameField _gameField;
 		
@@ -118,6 +120,9 @@ namespace Game.View
 
 						if (isNewTile)
 							_spawnOffsetsPerColumn[fallTile.Tile.Column]--;
+
+						if (_fallingTiles.Count == 0)
+							FallCompleted?.Invoke();
 					});
 			}
 		}
@@ -146,11 +151,11 @@ namespace Game.View
 			sequence.Append(
 				tileTransform.DOScale(removeTileAnimationConfig.scaleUp, removeTileAnimationConfig.scaleUpDuration)
 					.SetEase(removeTileAnimationConfig.scaleUpEase)
-			);
+				);
 			sequence.Append(
 				tileTransform.DOScale(0f, removeTileAnimationConfig.scaleDownDuration)
 					.SetEase(removeTileAnimationConfig.scaleDownEase)
-			);
+				);
 			sequence.OnComplete(() =>
 			{
 				_tileViewPool.ReturnTile(tile);

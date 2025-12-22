@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Blast.Model",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

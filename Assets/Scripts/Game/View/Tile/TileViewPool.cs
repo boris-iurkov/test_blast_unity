@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game.View
+namespace Game.View.Tile
 {
 	public class TileViewPool : MonoBehaviour
 	{

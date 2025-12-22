@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using Game.Controller.Data;
 using Game.Model;
 using Game.Model.Data;
 using Game.View;
 using Game.View.Data;
+using Game.View.Popup;
+using Game.View.Tile;
 using UnityEngine;
 
 namespace Game.Controller
@@ -13,9 +16,14 @@ namespace Game.Controller
 		private ScoreCounter _scoreCounter;
 		private GameField _gameField;
 		private GameFieldView _gameFieldView;
+		private EndGamePopup _endGamePopup;
+
+		private bool _isEndGame = false;
+		private EndGameResult _endGameResult = EndGameResult.None;
 
 		public void Init(
 			GameFieldView gameFieldView, 
+			EndGamePopup endGamePopup,
 			TileViewLibrary tileViewLibrary, 
 			TileViewPool tileViewPool, 
 			GameConfigData gameConfigData,
@@ -31,6 +39,11 @@ namespace Game.Controller
 				tileViewPool,
 				fieldConfigData);
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
+			_gameFieldView.FallCompleted += HandleFallCompleted;
+
+			_endGamePopup = endGamePopup;
+			_endGamePopup.gameObject.SetActive(false);
+			_endGamePopup.OnButtonClicked += HandleEndGamePopupButtonClicked;
 			
 			_movesCounter = new MovesCounter();
 			_movesCounter.OnMovesChanged += HandleMovesChanged;
@@ -43,6 +56,9 @@ namespace Game.Controller
 
 		private void HandleTileClick(int row, int column)
 		{
+			if (_isEndGame)
+				return;
+			
 			if (_gameFieldView.IsTileFalling(row, column))
 				return;
 			
@@ -82,19 +98,47 @@ namespace Game.Controller
 			_gameFieldView.UpdateScoreCount(score, targetScore);
 		}
 
+		private void HandleEndGamePopupButtonClicked()
+		{
+			_endGamePopup.Hide(() => _endGamePopup.gameObject.SetActive(false));
+		}
+
 		private void CheckEndGame()
 		{
 			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
 			{
-				Debug.Log("WIN");
+				SetEndGame(EndGameResult.Win);
 				return;
 			}
 
 			if (_movesCounter.MovesLeft <= 0)
 			{
-				Debug.Log("LOSE");
+				SetEndGame(EndGameResult.Lose);
 				return;
 			}
+
+			_isEndGame = false;
+			_endGameResult = EndGameResult.None;
+		}
+
+		private void SetEndGame(EndGameResult result)
+		{
+			_isEndGame = true;
+			_endGameResult = result;
+		}
+
+		private void HandleFallCompleted()
+		{
+			if (!_isEndGame)
+				return;
+			
+			ShowEndGamePopup();
+		}
+
+		private void ShowEndGamePopup()
+		{
+			_endGamePopup.gameObject.SetActive(true);
+			_endGamePopup.Show(_endGameResult == EndGameResult.Win);
 		}
 	}
 }

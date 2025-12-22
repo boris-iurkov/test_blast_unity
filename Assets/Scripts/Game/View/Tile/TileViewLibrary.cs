@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using Game.Model;
 using Game.Model.Data;
 using Game.View.Config;
 using UnityEngine;
 
-namespace Game.View
+namespace Game.View.Tile
 {
-	[CreateAssetMenu(menuName = "Game/Tile View Library")]
+	[CreateAssetMenu(menuName = "Game/Tile/Tile View Library")]
 	public class TileViewLibrary : ScriptableObject
 	{
 		[SerializeField] private TileViewConfig[] configs;
