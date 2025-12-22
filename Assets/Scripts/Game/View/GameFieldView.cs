@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using DG.Tweening;
 using Game.Model;
 using Game.Model.Data;
@@ -15,7 +16,10 @@ namespace Game.View
 		[SerializeField] private RectTransform tilesParent;
 		[SerializeField] private RemoveTileAnimationConfig removeTileAnimationConfig;
 		[SerializeField] private FallTileAnimationConfig fallTileAnimationConfig;
+		
+		[Space]
 		[SerializeField] private TextMeshProUGUI labelMoves;
+		[SerializeField] private TextMeshProUGUI labelScore;
 
 		public event Action<int, int> OnTileClickRequested;
 		
@@ -126,6 +130,11 @@ namespace Game.View
 		public void UpdateMovesCount(int movesLeft)
 		{
 			labelMoves.SetText(movesLeft.ToString());
+		}
+		
+		public void UpdateScoreCount(int score, int targetScore)
+		{
+			labelScore.SetText(score + "/" + targetScore);
 		}
 
 		private void RemoveTile(TileView tile)

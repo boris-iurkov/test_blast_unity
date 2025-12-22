@@ -13,7 +13,8 @@ namespace Game.Model
 		{
 			MaxMoves = maxMoves;
 			MovesLeft = maxMoves;
-			OnMovesChanged?.Invoke(MovesLeft);
+			
+			FireMovesChanged();
 		}
 
 		public void MakeMove()
@@ -23,6 +24,11 @@ namespace Game.Model
 			
 			MovesLeft--;
 			
+			FireMovesChanged();
+		}
+
+		private void FireMovesChanged()
+		{
 			OnMovesChanged?.Invoke(MovesLeft);
 		}
 	}

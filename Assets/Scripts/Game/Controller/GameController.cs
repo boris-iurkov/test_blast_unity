@@ -10,6 +10,7 @@ namespace Game.Controller
 	public class GameController
 	{
 		private MovesCounter _movesCounter;
+		private ScoreCounter _scoreCounter;
 		private GameField _gameField;
 		private GameFieldView _gameFieldView;
 
@@ -34,6 +35,10 @@ namespace Game.Controller
 			_movesCounter = new MovesCounter();
 			_movesCounter.OnMovesChanged += HandleMovesChanged;
 			_movesCounter.Init(gameConfigData.MaxMoves);
+
+			_scoreCounter = new ScoreCounter();
+			_scoreCounter.OnScoreChanged += HandleScoreChanged;
+			_scoreCounter.Init(gameConfigData.TargetScore);
 		}
 
 		private void HandleTileClick(int row, int column)
@@ -50,9 +55,11 @@ namespace Game.Controller
 					groupWithoutFallingTiles.Add(pos);
 			}
 			group = groupWithoutFallingTiles;
-			
+
 			if (group.Count < 2)
 				return;
+			
+			_scoreCounter.AddScoreForGroup(group.Count);
 			
 			_gameField.RemoveTileGroup(group);
 			_gameFieldView.RemoveTileGroup(group);
@@ -66,6 +73,11 @@ namespace Game.Controller
 		private void HandleMovesChanged(int movesLeft)
 		{
 			_gameFieldView.UpdateMovesCount(movesLeft);
+		}
+
+		private void HandleScoreChanged(int score, int targetScore)
+		{
+			_gameFieldView.UpdateScoreCount(score, targetScore);
 		}
 	}
 }

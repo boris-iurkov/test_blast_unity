@@ -14,9 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Blast.Model::Game.Model.Config.GameConfig
   rowsCount: 9
   columnsCount: 9
-  tileWidth: 100
-  tileHeight: 105
-  gameFieldWidth: 900
-  gameFieldHeight: 1000
-  targetScore: 500
+  targetScore: 2000
   maxMoves: 20
