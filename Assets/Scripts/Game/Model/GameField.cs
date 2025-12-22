@@ -15,10 +15,10 @@ namespace Game.Model
 		public int RowsCount { get; private set; }
 		public int ColumnsCount { get; private set; }
 
-		public void Init(int rowsCount, int columnsCount)
+		public void Init(GameConfigData configData)
 		{
-			RowsCount = rowsCount;
-			ColumnsCount = columnsCount;
+			RowsCount = configData.RowsCount;
+			ColumnsCount = configData.ColumnsCount;
 			
 			InitSourceColors();
 			InitStartTiles();

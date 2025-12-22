@@ -1693,6 +1693,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Blast.Core::Game.Core.GameEntry
   gameConfig: {fileID: 11400000, guid: b77d3e0a4b7f0e842bf393a59e98d27d, type: 2}
+  fieldConfig: {fileID: 11400000, guid: 2a4da4335e47bbc4b8a665a1f14f88a2, type: 2}
   gameFieldView: {fileID: 1757941691}
   tileViewLibrary: {fileID: 11400000, guid: e9b3903b11eaeb145b9dc76a7dc7668d, type: 2}
   tileViewPool: {fileID: 359600685}

@@ -4,6 +4,7 @@ using DG.Tweening;
 using Game.Model;
 using Game.Model.Data;
 using Game.View.Config;
+using Game.View.Data;
 using UnityEngine;
 
 namespace Game.View
@@ -35,18 +36,15 @@ namespace Game.View
 			GameField gameField, 
 			TileViewLibrary tileViewLibrary,
 			TileViewPool tileViewPool,
-			int tileWidth,
-			int tileHeight,
-			int gameFieldWidth,
-			int gameFieldHeight)
+			FieldConfigData configData)
 		{
 			_gameField = gameField;
 			_tileViewLibrary = tileViewLibrary;
 			_tileViewPool = tileViewPool;
-			_tileWidth = tileWidth;
-			_tileHeight = tileHeight;
-			_gameFieldWidth = gameFieldWidth;
-			_gameFieldHeight = gameFieldHeight;
+			_tileWidth = configData.TileWidth;
+			_tileHeight = configData.TileHeight;
+			_gameFieldWidth = configData.GameFieldWidth;
+			_gameFieldHeight = configData.GameFieldHeight;
 			
 			_tiles = new TileView[_gameField.RowsCount, _gameField.ColumnsCount];
 			_spawnOffsetsPerColumn = new int[_gameField.ColumnsCount];

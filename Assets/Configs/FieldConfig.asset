@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13b107af943c4a59a2d3e8a9a5ec684d, type: 3}
-  m_Name: FallTileAnimationConfig
-  m_EditorClassIdentifier: Blast.View::Game.View.Config.FallTileAnimationConfig
-  speed: 1000
-  startDelay: 0.15
-  cascadeDelayRange: 0.25
-  ease: 1
+  m_Script: {fileID: 11500000, guid: 0d560c4a064f41a3bb6d82a7db863a2a, type: 3}
+  m_Name: FieldConfig
+  m_EditorClassIdentifier: Blast.View::Game.View.Config.FieldConfig
+  tileWidth: 100
+  tileHeight: 105
+  gameFieldWidth: 900
+  gameFieldHeight: 1000

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Game.Model;
 using Game.Model.Data;
 using Game.View;
+using Game.View.Data;
 using UnityEngine;
 
 namespace Game.Controller
@@ -15,25 +16,18 @@ namespace Game.Controller
 			GameFieldView gameFieldView, 
 			TileViewLibrary tileViewLibrary, 
 			TileViewPool tileViewPool, 
-			int rowsCount, 
-			int columnsCount,
-			int tileWidth,
-			int tileHeight,
-			int gameFieldWidth,
-			int gameFieldHeight)
+			GameConfigData gameConfigData,
+			FieldConfigData fieldConfigData)
 		{
 			_gameField = new GameField();
-			_gameField.Init(rowsCount, columnsCount);
+			_gameField.Init(gameConfigData);
 			
 			_gameFieldView = gameFieldView;
 			_gameFieldView.Init(
 				_gameField, 
 				tileViewLibrary,
 				tileViewPool,
-				tileWidth,
-				tileHeight,
-				gameFieldWidth,
-				gameFieldHeight);
+				fieldConfigData);
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 		}
 
