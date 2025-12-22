@@ -1,4 +1,4 @@
-namespace Game.Model
+namespace Game.Model.Data
 {
 	public enum TileColor
 	{

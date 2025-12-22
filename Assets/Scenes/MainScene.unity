@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 18256396}
   - component: {fileID: 18256395}
   m_Layer: 5
-  m_Name: LabelSteps
+  m_Name: LabelMoves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -918,7 +918,7 @@ GameObject:
   - component: {fileID: 936269087}
   - component: {fileID: 936269086}
   m_Layer: 5
-  m_Name: Steps
+  m_Name: Moves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1513,6 +1513,7 @@ MonoBehaviour:
   tilesParent: {fileID: 1757941690}
   removeTileAnimationConfig: {fileID: 11400000, guid: dad814d998b599a459b16be99cc75f5f, type: 2}
   fallTileAnimationConfig: {fileID: 11400000, guid: cb90cf3382f7d324c96cb18f381c51a0, type: 2}
+  labelMoves: {fileID: 18256395}
 --- !u!114 &1757941692
 MonoBehaviour:
   m_ObjectHideFlags: 0

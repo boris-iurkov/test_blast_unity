@@ -1,3 +1,5 @@
+using Game.Model.Data;
+
 namespace Game.Model
 {
 	public class TileModel

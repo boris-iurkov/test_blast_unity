@@ -5,6 +5,7 @@ using Game.Model;
 using Game.Model.Data;
 using Game.View.Config;
 using Game.View.Data;
+using TMPro;
 using UnityEngine;
 
 namespace Game.View
@@ -14,6 +15,7 @@ namespace Game.View
 		[SerializeField] private RectTransform tilesParent;
 		[SerializeField] private RemoveTileAnimationConfig removeTileAnimationConfig;
 		[SerializeField] private FallTileAnimationConfig fallTileAnimationConfig;
+		[SerializeField] private TextMeshProUGUI labelMoves;
 
 		public event Action<int, int> OnTileClickRequested;
 		
@@ -91,11 +93,8 @@ namespace Game.View
 				float distance = Vector2.Distance(tile.RectTransform.localPosition, to);
 				float duration = distance / fallTileAnimationConfig.speed;
 
-				float delay =
-					fallTileAnimationConfig.startDelay +
-					(maxRow > 0
-						? (float)fallTile.To.x / maxRow * fallTileAnimationConfig.cascadeDelayRange
-						: 0f);
+				float delay = fallTileAnimationConfig.startDelay +
+				              (maxRow > 0 ? (float)fallTile.To.x / maxRow * fallTileAnimationConfig.cascadeDelayRange : 0f);
 
 				_tiles[fallTile.To.x, fallTile.To.y] = tile;
 
@@ -122,6 +121,11 @@ namespace Game.View
 		public bool IsTileFalling(int row, int column)
 		{
 			return _fallingTiles.Contains(new Vector2Int(row, column));
+		}
+
+		public void UpdateMovesCount(int movesLeft)
+		{
+			labelMoves.SetText(movesLeft.ToString());
 		}
 
 		private void RemoveTile(TileView tile)

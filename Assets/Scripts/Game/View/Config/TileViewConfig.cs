@@ -1,4 +1,5 @@
 using Game.Model;
+using Game.Model.Data;
 using UnityEngine;
 
 namespace Game.View.Config

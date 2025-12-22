@@ -9,6 +9,7 @@ namespace Game.Controller
 {
 	public class GameController
 	{
+		private MovesCounter _movesCounter;
 		private GameField _gameField;
 		private GameFieldView _gameFieldView;
 
@@ -29,6 +30,10 @@ namespace Game.Controller
 				tileViewPool,
 				fieldConfigData);
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
+			
+			_movesCounter = new MovesCounter();
+			_movesCounter.OnMovesChanged += HandleMovesChanged;
+			_movesCounter.Init(gameConfigData.MaxMoves);
 		}
 
 		private void HandleTileClick(int row, int column)
@@ -54,6 +59,13 @@ namespace Game.Controller
 
 			List<TileFallData> fallTiles = _gameField.ApplyFallTiles();
 			_gameFieldView.FallTiles(fallTiles);
+
+			_movesCounter.MakeMove();
+		}
+
+		private void HandleMovesChanged(int movesLeft)
+		{
+			_gameFieldView.UpdateMovesCount(movesLeft);
 		}
 	}
 }
