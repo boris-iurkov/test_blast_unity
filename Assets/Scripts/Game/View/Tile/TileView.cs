@@ -1,4 +1,5 @@
 using System;
+using Game.Model.Data;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,14 +13,16 @@ namespace Game.View.Tile
 
 		public RectTransform RectTransform => rectTransform;
 		public event Action<int, int> Clicked;
+		public TileColor Color { get; private set; }
 
 		private int _row;
 		private int _column;
 		private bool _clickable = true;
 
-		public void SetSprite(Sprite sprite)
+		public void SetSprite(Sprite sprite, TileColor color)
 		{
 			image.sprite = sprite;
+			Color = color;
 		}
 
 		public void SetPositions(int row, int column)

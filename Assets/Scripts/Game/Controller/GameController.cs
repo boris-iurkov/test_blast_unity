@@ -40,6 +40,7 @@ namespace Game.Controller
 				fieldConfigData);
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 			_gameFieldView.FallCompleted += HandleFallCompleted;
+			_gameFieldView.ShuffleCompleted += HandleShuffleCompleted;
 
 			_endGamePopup = endGamePopup;
 			_endGamePopup.gameObject.SetActive(false);
@@ -136,6 +137,16 @@ namespace Game.Controller
 			ShowEndGamePopup();
 		}
 
+		private void HandleShuffleCompleted()
+		{
+			TileColor[,] colors = _gameFieldView.GetCurrentTileColors();
+			_gameField.SetColors(colors);
+			
+			_isEndGame = false;
+			
+			CheckEndGame();
+		}
+
 		private void ShowEndGamePopup()
 		{
 			_endGamePopup.gameObject.SetActive(true);
@@ -172,11 +183,12 @@ namespace Game.Controller
 
 		private void RestartGame()
 		{
-			_isEndGame = false;
 			_endGameResult = EndGameResult.None;
 			
 			_movesCounter.Reset();
 			_scoreCounter.Reset();
+			
+			_gameFieldView.ShuffleTiles();
 		}
 	}
 }

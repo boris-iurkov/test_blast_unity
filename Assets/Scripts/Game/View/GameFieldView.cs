@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using DG.Tweening;
 using Game.Model;
 using Game.Model.Data;
@@ -9,14 +8,18 @@ using Game.View.Data;
 using Game.View.Tile;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Game.View
 {
 	public class GameFieldView : MonoBehaviour
 	{
 		[SerializeField] private RectTransform tilesParent;
+		
+		[Space]
 		[SerializeField] private RemoveTileAnimationConfig removeTileAnimationConfig;
 		[SerializeField] private FallTileAnimationConfig fallTileAnimationConfig;
+		[SerializeField] private ShuffleAnimationConfig shuffleAnimationConfig;
 		
 		[Space]
 		[SerializeField] private TextMeshProUGUI labelMoves;
@@ -24,6 +27,7 @@ namespace Game.View
 
 		public event Action<int, int> OnTileClickRequested;
 		public event Action FallCompleted;
+		public event Action ShuffleCompleted;
 		
 		private GameField _gameField;
 		
@@ -127,6 +131,60 @@ namespace Game.View
 			}
 		}
 		
+		public void ShuffleTiles()
+		{
+			int rows = _gameField.RowsCount;
+			int columns = _gameField.ColumnsCount;
+			
+			var tilesList = new List<TileView>();
+			foreach (TileView tileView in _tiles)
+				tilesList.Add(tileView);
+
+			for (int i = tilesList.Count - 1; i > 0; i--)
+			{
+				int j = Random.Range(0, i + 1);
+				(tilesList[i], tilesList[j]) = (tilesList[j], tilesList[i]);
+			}
+			
+			var index = 0;
+			var delay = 0f;
+			Sequence shuffleSequence = DOTween.Sequence();
+			for (var x = 0; x < rows; x++)
+			{
+				for (var y = 0; y < columns; y++)
+				{
+					TileView view = tilesList[index++];
+					Vector2 targetPos = CalculateTilePosition(x, y);
+					view.SetPositions(x, y);
+
+					float distance = Vector2.Distance(view.RectTransform.localPosition, targetPos);
+					float duration = distance / shuffleAnimationConfig.speed;
+
+					shuffleSequence.Insert(delay, view.RectTransform.DOLocalMove(targetPos, duration).SetEase(shuffleAnimationConfig.moveEase));
+					delay += shuffleAnimationConfig.stepDelay;
+				}
+			}
+
+			index = 0;
+			for (var row = 0; row < rows; row++)
+			for (var column = 0; column < columns; column++)
+				_tiles[row, column] = tilesList[index++];
+			
+			shuffleSequence.OnComplete(() =>
+			{
+				ShuffleCompleted?.Invoke();
+			});
+		}
+
+		public TileColor[,] GetCurrentTileColors()
+		{
+			var colors = new TileColor[_gameField.RowsCount, _gameField.ColumnsCount];
+			for (var row = 0; row < _gameField.RowsCount; row++)
+			for (var column = 0; column < _gameField.ColumnsCount; column++)
+				colors[row, column] = _tiles[row, column].Color;
+			return colors;
+		}
+		
 		public bool IsTileFalling(int row, int column)
 		{
 			return _fallingTiles.Contains(new Vector2Int(row, column));
@@ -187,7 +245,7 @@ namespace Game.View
 			TileView tileView = _tileViewPool.GetTile();
 			tileView.transform.SetParent(tilesParent, false);
 
-			tileView.SetSprite(sprite);
+			tileView.SetSprite(sprite, tile.Color);
 			tileView.SetPositions(row, column);
 
 			tileView.Clicked += OnTileClicked;

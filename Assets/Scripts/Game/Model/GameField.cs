@@ -125,6 +125,13 @@ namespace Game.Model
 			return false;
 		}
 
+		public void SetColors(TileColor[,] colors)
+		{
+			for (var row = 0; row < RowsCount; row++)
+			for (var column = 0; column < ColumnsCount; column++)
+				_tiles[row, column].SetColor(colors[row, column]);
+		}
+
 		private void InitSourceColors()
 		{
 			_sourceColors = (TileColor[])Enum.GetValues(typeof(TileColor));
