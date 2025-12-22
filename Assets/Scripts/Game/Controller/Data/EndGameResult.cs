@@ -4,6 +4,7 @@ namespace Game.Controller.Data
 	{
 		None,
 		Win,
-		Lose
+		LoseNoMoves,
+		LoseNoTiles
 	}
 }

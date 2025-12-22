@@ -95,6 +95,35 @@ namespace Game.Model
 			
 			return result;
 		}
+		
+		public bool HasAnyAvailableGroup()
+		{
+			for (var row = 0; row < RowsCount; row++)
+			{
+				for (var col = 0; col < ColumnsCount; col++)
+				{
+					TileModel tile = _tiles[row, col];
+					if (tile == null)
+						continue;
+					
+					if (col + 1 < ColumnsCount)
+					{
+						TileModel right = _tiles[row, col + 1];
+						if (right != null && right.Color == tile.Color)
+							return true;
+					}
+					
+					if (row + 1 < RowsCount)
+					{
+						TileModel up = _tiles[row + 1, col];
+						if (up != null && up.Color == tile.Color)
+							return true;
+					}
+				}
+			}
+
+			return false;
+		}
 
 		private void InitSourceColors()
 		{

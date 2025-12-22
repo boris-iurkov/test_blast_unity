@@ -10,8 +10,12 @@ namespace Game.View.Config
 		public string buttonWin = "Заново";
 		
 		[Space]
-		public string titleLose = "Поражение";
-		public string buttonLose = "Еще раз";
+		public string titleLoseNoMoves = "Ходов нет";
+		public string buttonLoseNoMoves = "Еще раз";
+		
+		[Space]
+		public string titleLoseNoTiles = "Групп тайлов нет";
+		public string buttonLoseNoTiles = "Рестарт";
 
 		[Space] 
 		public float backgroundFadeDuration = 0.2f;

@@ -108,7 +108,13 @@ namespace Game.Controller
 
 			if (_movesCounter.MovesLeft <= 0)
 			{
-				SetEndGame(EndGameResult.Lose);
+				SetEndGame(EndGameResult.LoseNoMoves);
+				return;
+			}
+
+			if (!_gameField.HasAnyAvailableGroup())
+			{
+				SetEndGame(EndGameResult.LoseNoTiles);
 				return;
 			}
 
@@ -133,7 +139,26 @@ namespace Game.Controller
 		private void ShowEndGamePopup()
 		{
 			_endGamePopup.gameObject.SetActive(true);
-			_endGamePopup.Show(_endGameResult == EndGameResult.Win);
+			EndGamePopupState state = GetEndGamePopupState(_endGameResult);
+			_endGamePopup.Show(state);
+		}
+
+		private EndGamePopupState GetEndGamePopupState(EndGameResult endGameResult)
+		{
+			switch (endGameResult)
+			{
+				case EndGameResult.Win:
+					return EndGamePopupState.Win;
+				
+				case EndGameResult.LoseNoMoves:
+					return EndGamePopupState.LoseNoMoves;
+				
+				case EndGameResult.LoseNoTiles:
+					return EndGamePopupState.LoseNoTiles;
+				
+				default:
+					return EndGamePopupState.Win;
+			}
 		}
 		
 		private void HandleEndGamePopupButtonClicked()

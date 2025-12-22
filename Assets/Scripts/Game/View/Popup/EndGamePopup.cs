@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using Game.View.Config;
+using Game.View.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,17 +23,24 @@ namespace Game.View.Popup
 
 		public event Action OnButtonClicked;
 
-		public void Show(bool win)
+		public void Show(EndGamePopupState state)
 		{
-			if (win)
+			switch (state)
 			{
-				title.SetText(endGamePopupConfig.titleWin);
-				buttonText.SetText(endGamePopupConfig.buttonWin);
-			}
-			else
-			{
-				title.SetText(endGamePopupConfig.titleLose);
-				buttonText.SetText(endGamePopupConfig.buttonLose);
+				case EndGamePopupState.Win:
+					title.SetText(endGamePopupConfig.titleWin);
+					buttonText.SetText(endGamePopupConfig.buttonWin);
+					break;
+				
+				case EndGamePopupState.LoseNoMoves:
+					title.SetText(endGamePopupConfig.titleLoseNoMoves);
+					buttonText.SetText(endGamePopupConfig.buttonLoseNoMoves);
+					break;
+				
+				case EndGamePopupState.LoseNoTiles:
+					title.SetText(endGamePopupConfig.titleLoseNoTiles);
+					buttonText.SetText(endGamePopupConfig.buttonLoseNoTiles);
+					break;
 			}
 
 			button.onClick.AddListener(HandleButtonClicked);
