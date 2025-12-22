@@ -43,6 +43,7 @@ namespace Game.View
 		private int[] _spawnOffsetsPerColumn;
 		
 		private readonly HashSet<Vector2Int> _fallingTiles = new();
+		private bool _isShuffling = false;
 
 		public void Init(
 			GameField gameField, 
@@ -133,12 +134,17 @@ namespace Game.View
 		
 		public void ShuffleTiles()
 		{
+			_isShuffling = true;
+			
 			int rows = _gameField.RowsCount;
 			int columns = _gameField.ColumnsCount;
 			
 			var tilesList = new List<TileView>();
 			foreach (TileView tileView in _tiles)
+			{
 				tilesList.Add(tileView);
+				tileView.SetClickable(false);
+			}
 
 			for (int i = tilesList.Count - 1; i > 0; i--)
 			{
@@ -164,14 +170,18 @@ namespace Game.View
 					delay += shuffleAnimationConfig.stepDelay;
 				}
 			}
-
-			index = 0;
-			for (var row = 0; row < rows; row++)
-			for (var column = 0; column < columns; column++)
-				_tiles[row, column] = tilesList[index++];
 			
 			shuffleSequence.OnComplete(() =>
 			{
+				index = 0;
+				for (var row = 0; row < rows; row++)
+				for (var column = 0; column < columns; column++)
+					_tiles[row, column] = tilesList[index++];
+				
+				foreach (TileView tileView in _tiles)
+					tileView.SetClickable(true);
+				
+				_isShuffling = false;
 				ShuffleCompleted?.Invoke();
 			});
 		}
@@ -264,6 +274,9 @@ namespace Game.View
 
 		private void OnTileClicked(int row, int column)
 		{
+			if (_isShuffling)
+				return;
+				
 			if (IsTileFalling(row, column))
 				return;
 				
