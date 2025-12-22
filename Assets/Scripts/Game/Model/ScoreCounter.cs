@@ -5,14 +5,13 @@ namespace Game.Model
 	public class ScoreCounter
 	{
 		public int TargetScore { get; private set; }
+		public int Score { get; private set; }
 		
 		public event Action<int, int> OnScoreChanged;
 
-		private int _score;
-		
 		public void Init(int targetScore)
 		{
-			_score = 0;
+			Score = 0;
 			TargetScore = targetScore;
 			
 			FireScoreChanged();
@@ -22,7 +21,7 @@ namespace Game.Model
 		{
 			int scorePerTile = GetScorePerTile(groupSize);
 			int totalScore = scorePerTile * groupSize;
-			_score += totalScore;
+			Score += totalScore;
 			
 			FireScoreChanged();
 		}
@@ -37,7 +36,7 @@ namespace Game.Model
 
 		private void FireScoreChanged()
 		{
-			OnScoreChanged?.Invoke(_score, TargetScore);
+			OnScoreChanged?.Invoke(Score, TargetScore);
 		}
 	}
 }

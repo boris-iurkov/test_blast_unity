@@ -68,6 +68,8 @@ namespace Game.Controller
 			_gameFieldView.FallTiles(fallTiles);
 
 			_movesCounter.MakeMove();
+			
+			CheckEndGame();
 		}
 
 		private void HandleMovesChanged(int movesLeft)
@@ -78,6 +80,21 @@ namespace Game.Controller
 		private void HandleScoreChanged(int score, int targetScore)
 		{
 			_gameFieldView.UpdateScoreCount(score, targetScore);
+		}
+
+		private void CheckEndGame()
+		{
+			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
+			{
+				Debug.Log("WIN");
+				return;
+			}
+
+			if (_movesCounter.MovesLeft <= 0)
+			{
+				Debug.Log("LOSE");
+				return;
+			}
 		}
 	}
 }
