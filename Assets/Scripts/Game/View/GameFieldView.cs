@@ -17,6 +17,7 @@ namespace Game.View
 		public event Action<int, int> OnTileClickRequested;
 		
 		private GameField _gameField;
+		
 		private TileViewLibrary _tileViewLibrary;
 		private TileView[,] _tiles;
 		private TileViewPool _tileViewPool;
@@ -25,6 +26,8 @@ namespace Game.View
 		private int _tileHeight;
 		private int _gameFieldWidth;
 		private int _gameFieldHeight;
+		
+		private int[] _spawnOffsetsPerColumn;
 		
 		private readonly HashSet<Vector2Int> _fallingTiles = new();
 
@@ -46,7 +49,8 @@ namespace Game.View
 			_gameFieldHeight = gameFieldHeight;
 			
 			_tiles = new TileView[_gameField.RowsCount, _gameField.ColumnsCount];
-			
+			_spawnOffsetsPerColumn = new int[_gameField.ColumnsCount];
+
 			FillField();
 		}
 
@@ -74,7 +78,9 @@ namespace Game.View
 				if (isNewTile)
 				{
 					tile = CreateTile(fallTile.Tile);
-					tile.RectTransform.anchoredPosition = CalculateTilePosition(fallTile.From.x, fallTile.From.y);
+					int additionalRow = _spawnOffsetsPerColumn[fallTile.Tile.Column];
+					tile.RectTransform.anchoredPosition = CalculateTilePosition(_gameField.RowsCount + additionalRow + 1, fallTile.From.y);
+					_spawnOffsetsPerColumn[fallTile.Tile.Column]++;
 				}
 				else
 				{
@@ -108,6 +114,9 @@ namespace Game.View
 					{
 						_fallingTiles.Remove(fallTile.To);
 						tile.SetClickable(true);
+
+						if (isNewTile)
+							_spawnOffsetsPerColumn[fallTile.Tile.Column]--;
 					});
 			}
 		}

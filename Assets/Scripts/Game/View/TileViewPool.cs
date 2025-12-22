@@ -26,6 +26,7 @@ namespace Game.View
 		public TileView GetTile()
 		{
 			TileView tile = _stack.Count > 0 ? _stack.Pop() : CreateNewTile();
+			tile.transform.localScale = Vector3.one;
 			tile.gameObject.SetActive(true);
 			return tile;
 		}
