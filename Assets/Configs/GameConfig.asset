@@ -16,3 +16,4 @@ MonoBehaviour:
   columnsCount: 9
   targetScore: 2000
   maxMoves: 20
+  maxShuffles: 3
