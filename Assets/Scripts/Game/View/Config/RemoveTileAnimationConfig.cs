@@ -1,9 +1,10 @@
 using DG.Tweening;
+using UnityEngine;
 
-namespace Game.View.Animation
+namespace Game.View.Config
 {
-	[System.Serializable]
-	public class RemoveAnimationSettings
+	[CreateAssetMenu(menuName = "Game/Animation/Remove Tile Animation Config")]
+	public class RemoveTileAnimationConfig : ScriptableObject
 	{
 		public float scaleUp = 1.2f;
 		public float scaleUpDuration = 0.12f;

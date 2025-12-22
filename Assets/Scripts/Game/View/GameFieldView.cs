@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Game.Model;
 using Game.Model.Data;
-using Game.View.Animation;
+using Game.View.Config;
 using UnityEngine;
 
 namespace Game.View
@@ -11,8 +11,8 @@ namespace Game.View
 	public class GameFieldView : MonoBehaviour
 	{
 		[SerializeField] private RectTransform tilesParent;
-		[SerializeField] private RemoveAnimationSettings removeAnimationSettings;
-		[SerializeField] private FallAnimationSettings fallAnimationSettings;
+		[SerializeField] private RemoveTileAnimationConfig removeTileAnimationConfig;
+		[SerializeField] private FallTileAnimationConfig fallTileAnimationConfig;
 
 		public event Action<int, int> OnTileClickRequested;
 		
@@ -72,8 +72,8 @@ namespace Game.View
 				Vector2 to = CalculateTilePosition(fallTile.To.x, fallTile.To.y);
 				
 				float distance = Vector2.Distance(from, to);
-				float duration = distance / fallAnimationSettings.speed;
-				float delay = fallAnimationSettings.startDelay + (maxRow > 0 ? (float)fallTile.From.x / maxRow * fallAnimationSettings.cascadeDelayRange : 0f);
+				float duration = distance / fallTileAnimationConfig.speed;
+				float delay = fallTileAnimationConfig.startDelay + (maxRow > 0 ? (float)fallTile.From.x / maxRow * fallTileAnimationConfig.cascadeDelayRange : 0f);
 				
 				_tiles[fallTile.From.x, fallTile.From.y] = null;
 				_tiles[fallTile.To.x, fallTile.To.y] = tile;
@@ -87,7 +87,7 @@ namespace Game.View
 				tile.RectTransform
 					.DOLocalMove(new Vector3(to.x, to.y), duration)
 					.SetDelay(delay)
-					.SetEase(fallAnimationSettings.ease)
+					.SetEase(fallTileAnimationConfig.ease)
 					.OnComplete(() =>
 					{
 						_fallingTiles.Remove(fallTile.To);
@@ -108,12 +108,12 @@ namespace Game.View
 
 			Sequence sequence = DOTween.Sequence();
 			sequence.Append(
-				tileTransform.DOScale(removeAnimationSettings.scaleUp, removeAnimationSettings.scaleUpDuration)
-					.SetEase(removeAnimationSettings.scaleUpEase)
+				tileTransform.DOScale(removeTileAnimationConfig.scaleUp, removeTileAnimationConfig.scaleUpDuration)
+					.SetEase(removeTileAnimationConfig.scaleUpEase)
 			);
 			sequence.Append(
-				tileTransform.DOScale(0f, removeAnimationSettings.scaleDownDuration)
-					.SetEase(removeAnimationSettings.scaleDownEase)
+				tileTransform.DOScale(0f, removeTileAnimationConfig.scaleDownDuration)
+					.SetEase(removeTileAnimationConfig.scaleDownEase)
 			);
 			sequence.OnComplete(() =>
 			{

@@ -1510,6 +1510,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Blast.View::Game.View.GameFieldView
   tilesParent: {fileID: 1757941690}
+  removeTileAnimationConfig: {fileID: 11400000, guid: dad814d998b599a459b16be99cc75f5f, type: 2}
+  fallTileAnimationConfig: {fileID: 11400000, guid: cb90cf3382f7d324c96cb18f381c51a0, type: 2}
 --- !u!1 &2101027709
 GameObject:
   m_ObjectHideFlags: 0
