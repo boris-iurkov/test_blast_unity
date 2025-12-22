@@ -9,5 +9,6 @@ namespace Game.Model.Config
 		public int columnsCount = 9;
 		public int targetScore = 500;
 		public int maxMoves = 20;
+		public int maxShuffles = 3;
 	}
 }

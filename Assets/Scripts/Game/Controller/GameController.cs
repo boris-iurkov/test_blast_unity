@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Game.Controller.Data;
 using Game.Model;
 using Game.Model.Data;
@@ -20,6 +21,8 @@ namespace Game.Controller
 
 		private bool _isEndGame = false;
 		private EndGameResult _endGameResult = EndGameResult.None;
+		private int _countShufflesMade = 0;
+		private int _maxShuffles;
 
 		public void Init(
 			GameFieldView gameFieldView, 
@@ -53,6 +56,8 @@ namespace Game.Controller
 			_scoreCounter = new ScoreCounter();
 			_scoreCounter.OnScoreChanged += HandleScoreChanged;
 			_scoreCounter.Init(gameConfigData.TargetScore);
+
+			_maxShuffles = gameConfigData.MaxShuffles;
 		}
 
 		private void HandleTileClick(int row, int column)
@@ -85,8 +90,6 @@ namespace Game.Controller
 			_gameFieldView.FallTiles(fallTiles);
 
 			_movesCounter.MakeMove();
-			
-			CheckEndGame();
 		}
 
 		private void HandleMovesChanged(int movesLeft)
@@ -115,7 +118,16 @@ namespace Game.Controller
 
 			if (!_gameField.HasAnyAvailableGroup())
 			{
-				SetEndGame(EndGameResult.LoseNoTiles);
+				if (_countShufflesMade < _maxShuffles)
+				{
+					DOVirtual.DelayedCall(1f, () =>
+					{
+						_countShufflesMade++;
+						Shuffle();
+					});
+				}
+				else
+					SetEndGame(EndGameResult.LoseNoTiles);
 				return;
 			}
 
@@ -131,6 +143,8 @@ namespace Game.Controller
 
 		private void HandleFallCompleted()
 		{
+			CheckEndGame();
+			
 			if (!_isEndGame)
 				return;
 			
@@ -184,10 +198,16 @@ namespace Game.Controller
 		private void RestartGame()
 		{
 			_endGameResult = EndGameResult.None;
+			_countShufflesMade = 0;
 			
 			_movesCounter.Reset();
 			_scoreCounter.Reset();
 			
+			_gameFieldView.ShuffleTiles();
+		}
+
+		private void Shuffle()
+		{
 			_gameFieldView.ShuffleTiles();
 		}
 	}

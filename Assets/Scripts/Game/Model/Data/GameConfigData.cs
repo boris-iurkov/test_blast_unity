@@ -6,5 +6,6 @@ namespace Game.Model.Data
 		public int ColumnsCount;
 		public int TargetScore;
 		public int MaxMoves;
+		public int MaxShuffles;
 	}
 }

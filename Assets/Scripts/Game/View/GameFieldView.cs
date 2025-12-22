@@ -176,8 +176,11 @@ namespace Game.View
 				index = 0;
 				for (var row = 0; row < rows; row++)
 				for (var column = 0; column < columns; column++)
+				{
 					_tiles[row, column] = tilesList[index++];
-				
+					_tiles[row, column].RectTransform.SetSiblingIndex(row * columns + column);
+				}
+
 				foreach (TileView tileView in _tiles)
 					tileView.SetClickable(true);
 				

@@ -32,7 +32,8 @@ namespace Game.Core
 				RowsCount = gameConfig.rowsCount,
 				ColumnsCount = gameConfig.columnsCount,
 				TargetScore = gameConfig.targetScore,
-				MaxMoves = gameConfig.maxMoves
+				MaxMoves = gameConfig.maxMoves,
+				MaxShuffles = gameConfig.maxShuffles
 			};
 			
 			var fieldConfigData = new FieldConfigData
