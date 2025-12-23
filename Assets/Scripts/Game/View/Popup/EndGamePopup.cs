@@ -25,6 +25,8 @@ namespace Game.View.Popup
 
 		public void Show(EndGamePopupState state)
 		{
+			button.onClick.RemoveAllListeners();
+			
 			switch (state)
 			{
 				case EndGamePopupState.Win:
@@ -43,8 +45,6 @@ namespace Game.View.Popup
 					break;
 			}
 
-			button.onClick.AddListener(HandleButtonClicked);
-			
 			content.localScale = Vector3.zero;
 			background.alpha = 0;
 			
@@ -56,12 +56,14 @@ namespace Game.View.Popup
 				content.DOScale(1f, endGamePopupConfig.contentScaleDuration)
 					.SetEase(endGamePopupConfig.contentShowEase)
 				);
+			sequence.OnComplete(() =>
+			{
+				button.onClick.AddListener(HandleButtonClicked);
+			});
 		}
 
 		public void Hide(Action onComplete = null)
 		{
-			button.onClick.RemoveListener(HandleButtonClicked);
-			
 			Sequence sequence = DOTween.Sequence();
 			sequence.Append(
 				content.DOScale(0f, endGamePopupConfig.contentScaleDuration)
@@ -78,6 +80,7 @@ namespace Game.View.Popup
 
 		private void HandleButtonClicked()
 		{
+			button.onClick.RemoveAllListeners();
 			OnButtonClicked?.Invoke();
 		}
 	}

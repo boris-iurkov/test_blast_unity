@@ -13,8 +13,6 @@ namespace Game.Model
 		{
 			Score = 0;
 			TargetScore = targetScore;
-			
-			FireScoreChanged();
 		}
 
 		public void AddScoreForGroup(int groupSize)
@@ -29,8 +27,6 @@ namespace Game.Model
 		public void Reset()
 		{
 			Score = 0;
-			
-			FireScoreChanged();
 		}
 		
 		private int GetScorePerTile(int groupSize)

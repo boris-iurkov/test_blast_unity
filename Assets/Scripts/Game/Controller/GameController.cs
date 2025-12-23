@@ -23,6 +23,7 @@ namespace Game.Controller
 		private EndGameResult _endGameResult = EndGameResult.None;
 		private int _countShufflesMade = 0;
 		private int _maxShuffles;
+		private bool _isShuffling = false;
 
 		public void Init(
 			GameFieldView gameFieldView, 
@@ -48,23 +49,29 @@ namespace Game.Controller
 			_endGamePopup = endGamePopup;
 			_endGamePopup.gameObject.SetActive(false);
 			_endGamePopup.OnButtonClicked += HandleEndGamePopupButtonClicked;
-			
-			_movesCounter = new MovesCounter();
-			_movesCounter.OnMovesChanged += HandleMovesChanged;
-			_movesCounter.Init(gameConfigData.MaxMoves);
 
 			_scoreCounter = new ScoreCounter();
-			_scoreCounter.OnScoreChanged += HandleScoreChanged;
 			_scoreCounter.Init(gameConfigData.TargetScore);
+			_scoreCounter.OnScoreChanged += HandleScoreChanged;
+			
+			_movesCounter = new MovesCounter();
+			_movesCounter.Init(gameConfigData.MaxMoves);
+			_movesCounter.OnMovesChanged += HandleMovesChanged;
 
 			_maxShuffles = gameConfigData.MaxShuffles;
+			
+			UpdateScoreView(_scoreCounter.Score, _scoreCounter.TargetScore);
+			UpdateMovesView(_movesCounter.MovesLeft);
 		}
 
 		private void HandleTileClick(int row, int column)
 		{
 			if (_isEndGame)
 				return;
-			
+
+			if (_isShuffling)
+				return;
+
 			if (_gameFieldView.IsTileFalling(row, column))
 				return;
 			
@@ -80,85 +87,120 @@ namespace Game.Controller
 
 			if (group.Count < 2)
 				return;
-			
-			_scoreCounter.AddScoreForGroup(group.Count);
-			
+
 			_gameField.RemoveTileGroup(group);
 			_gameFieldView.RemoveTileGroup(group);
 
-			List<TileFallData> fallTiles = _gameField.ApplyFallTiles();
-			_gameFieldView.FallTiles(fallTiles);
+			List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
+			_gameFieldView.FallTiles(fallingTiles);
 
+			_scoreCounter.AddScoreForGroup(group.Count);
 			_movesCounter.MakeMove();
 		}
-
-		private void HandleMovesChanged(int movesLeft)
+		
+		private void HandleScoreChanged(int score, int targetScore)
 		{
-			_gameFieldView.UpdateMovesCount(movesLeft);
+			UpdateScoreView(score, targetScore);
+			TryEndGame();
 		}
 
-		private void HandleScoreChanged(int score, int targetScore)
+		private void UpdateScoreView(int score, int targetScore)
 		{
 			_gameFieldView.UpdateScoreCount(score, targetScore);
 		}
 
-		private void CheckEndGame()
+		private void HandleMovesChanged(int movesLeft)
 		{
-			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
-			{
-				SetEndGame(EndGameResult.Win);
-				return;
-			}
-
-			if (_movesCounter.MovesLeft <= 0)
-			{
-				SetEndGame(EndGameResult.LoseNoMoves);
-				return;
-			}
-
-			if (!_gameField.HasAnyAvailableGroup())
-			{
-				if (_countShufflesMade < _maxShuffles)
-				{
-					DOVirtual.DelayedCall(1f, () =>
-					{
-						_countShufflesMade++;
-						Shuffle();
-					});
-				}
-				else
-					SetEndGame(EndGameResult.LoseNoTiles);
-				return;
-			}
-
-			_isEndGame = false;
-			_endGameResult = EndGameResult.None;
+			UpdateMovesView(movesLeft);
+			TryEndGame();
 		}
 
-		private void SetEndGame(EndGameResult result)
+		private void UpdateMovesView(int movesLeft)
 		{
-			_isEndGame = true;
-			_endGameResult = result;
+			_gameFieldView.UpdateMovesCount(movesLeft);
+		}
+		
+		private void TryEndGame()
+		{
+			if (_isEndGame)
+				return;
+			
+			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.Win;
+				return;
+			}
+			
+			if (_movesCounter.MovesLeft <= 0)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.LoseNoMoves;
+				return;
+			}
+
+			if (_countShufflesMade >= _maxShuffles)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.LoseNoTiles;
+			}
 		}
 
 		private void HandleFallCompleted()
 		{
-			CheckEndGame();
-			
-			if (!_isEndGame)
-				return;
-			
-			ShowEndGamePopup();
+			TryEndGameByShuffle();
+
+			if (_isEndGame)
+				ShowEndGamePopup();
+		}
+
+		private void TryEndGameByShuffle()
+		{
+			ShuffleResult shuffleResult = TryShuffle();
+			if (shuffleResult == ShuffleResult.MaxShuffles)
+				TryEndGame();
+		}
+
+		private ShuffleResult TryShuffle()
+		{
+			ShuffleResult shuffleResult = GetShuffleResult();
+
+			if (shuffleResult == ShuffleResult.NeedShuffle)
+			{
+				_isShuffling = true;
+				_countShufflesMade++;
+				DOVirtual.DelayedCall(1f, () =>
+				{
+					_gameFieldView.ShuffleTiles();
+				});
+			}
+
+			return shuffleResult;
+		}
+
+		private ShuffleResult GetShuffleResult()
+		{
+			if (_isEndGame)
+				return ShuffleResult.EndGame;
+
+			if (_gameField.HasAnyAvailableGroup())
+				return ShuffleResult.HasGroup;
+
+			if (_countShufflesMade < _maxShuffles)
+				return ShuffleResult.NeedShuffle;
+
+			return ShuffleResult.MaxShuffles;
 		}
 
 		private void HandleShuffleCompleted()
 		{
 			TileColor[,] colors = _gameFieldView.GetCurrentTileColors();
 			_gameField.SetColors(colors);
-			
+
+			_isShuffling = false;
 			_isEndGame = false;
-			
-			CheckEndGame();
+
+			TryEndGameByShuffle();
 		}
 
 		private void ShowEndGamePopup()
@@ -199,15 +241,14 @@ namespace Game.Controller
 		{
 			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
-			
+
 			_movesCounter.Reset();
 			_scoreCounter.Reset();
 			
-			_gameFieldView.ShuffleTiles();
-		}
-
-		private void Shuffle()
-		{
+			UpdateScoreView(_scoreCounter.Score, _scoreCounter.TargetScore);
+			UpdateMovesView(_movesCounter.MovesLeft);
+			
+			_isShuffling = true;
 			_gameFieldView.ShuffleTiles();
 		}
 	}

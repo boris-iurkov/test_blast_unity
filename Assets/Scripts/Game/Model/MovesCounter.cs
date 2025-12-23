@@ -13,8 +13,6 @@ namespace Game.Model
 		{
 			MaxMoves = maxMoves;
 			MovesLeft = maxMoves;
-			
-			FireMovesChanged();
 		}
 
 		public void MakeMove()
@@ -30,8 +28,6 @@ namespace Game.Model
 		public void Reset()
 		{
 			MovesLeft = MaxMoves;
-			
-			FireMovesChanged();
 		}
 
 		private void FireMovesChanged()
