@@ -43,6 +43,7 @@ namespace Game.View
 		private int[] _spawnOffsetsPerColumn;
 		
 		private readonly HashSet<Vector2Int> _fallingTiles = new();
+		private int _currentFallPackCount = 0;
 
 		public void Init(
 			GameField gameField, 
@@ -78,6 +79,8 @@ namespace Game.View
 		public void FallTiles(List<TileFallData> fallTiles)
 		{
 			int maxRow = _gameField.RowsCount - 1;
+			
+			_currentFallPackCount += fallTiles.Count;
 
 			foreach (TileFallData fallTile in fallTiles)
 			{
@@ -124,9 +127,14 @@ namespace Game.View
 
 						if (isNewTile)
 							_spawnOffsetsPerColumn[fallTile.Tile.Column]--;
-
-						if (_fallingTiles.Count == 0)
+						
+						_currentFallPackCount--;
+						
+						if (_currentFallPackCount == 0 && _fallingTiles.Count == 0)
+						{
+							_currentFallPackCount = 0;
 							FallCompleted?.Invoke();
+						}
 					});
 			}
 		}
@@ -197,6 +205,11 @@ namespace Game.View
 		public bool IsTileFalling(int row, int column)
 		{
 			return _fallingTiles.Contains(new Vector2Int(row, column));
+		}
+
+		public bool HasFallingTiles()
+		{
+			return _fallingTiles.Count > 0;
 		}
 
 		public void UpdateMovesCount(int movesLeft)

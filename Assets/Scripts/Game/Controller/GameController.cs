@@ -148,6 +148,10 @@ namespace Game.Controller
 
 		private void HandleFallCompleted()
 		{
+
+			if (_gameFieldView.HasFallingTiles())
+				return;
+			
 			TryEndGameByShuffle();
 
 			if (_isEndGame)
