@@ -24,13 +24,31 @@ namespace Game.Model
 			InitStartTiles();
 		}
 
-		public List<Vector2Int> GetTileGroup(int row, int column)
+		public List<Vector2Int> GetCommonTileGroup(int row, int column)
 		{
 			var result = new List<Vector2Int>();
 			var visited = new bool[RowsCount, ColumnsCount];
 			
 			TileModel startTile = _tiles[row, column];
 			AddNeighborTiles(row, column, startTile.Color, visited, result);
+
+			return result;
+		}
+		
+		public List<Vector2Int> GetBoosterBombTileGroup(int row, int column, int radius)
+		{
+			var result = new List<Vector2Int>();
+
+			for (int r = row - radius; r <= row + radius; r++)
+			{
+				for (int c = column - radius; c <= column + radius; c++)
+				{
+					if (!IsTileInsideField(r, c))
+						continue;
+
+					result.Add(new Vector2Int(r, c));
+				}
+			}
 
 			return result;
 		}
@@ -130,6 +148,14 @@ namespace Game.Model
 			for (var row = 0; row < RowsCount; row++)
 			for (var column = 0; column < ColumnsCount; column++)
 				_tiles[row, column].SetColor(colors[row, column]);
+		}
+
+		private bool IsTileInsideField(int row, int column)
+		{
+			return row >= 0 &&
+			       row < RowsCount &&
+			       column >= 0 &&
+			       column < ColumnsCount;
 		}
 
 		private void InitSourceColors()

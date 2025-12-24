@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Game.Controller.Data;
 using Game.Model;
+using Game.Model.Booster;
 using Game.Model.Data;
 using Game.View;
 using Game.View.Data;
@@ -13,20 +14,34 @@ namespace Game.Controller
 {
 	public class GameController
 	{
+		private GameField _gameField;
 		private MovesCounter _movesCounter;
 		private ScoreCounter _scoreCounter;
-		private GameField _gameField;
+		private BoosterCounter _boosterSwap;
+		private BoosterBombCounter _boosterBomb;
+
 		private GameFieldView _gameFieldView;
+		private MovesView _movesView;
+		private ScoreView _scoreView;
+		private BoosterPanelView _boosterSwapView;
+		private BoosterPanelView _boosterBombView;
 		private EndGamePopup _endGamePopup;
 
 		private bool _isEndGame = false;
 		private EndGameResult _endGameResult = EndGameResult.None;
-		private int _countShufflesMade = 0;
+		
 		private int _maxShuffles;
+		private int _countShufflesMade = 0;
 		private bool _isShuffling = false;
 
+		private InteractionMode _interactionMode = InteractionMode.Common;
+
 		public void Init(
-			GameFieldView gameFieldView, 
+			GameFieldView gameFieldView,
+			MovesView movesView,
+			ScoreView scoreView,
+			BoosterPanelView boosterSwapView,
+			BoosterPanelView boosterBombView,
 			EndGamePopup endGamePopup,
 			TileViewLibrary tileViewLibrary, 
 			TileViewPool tileViewPool, 
@@ -46,22 +61,42 @@ namespace Game.Controller
 			_gameFieldView.FallCompleted += HandleFallCompleted;
 			_gameFieldView.ShuffleCompleted += HandleShuffleCompleted;
 
+			_boosterSwapView = boosterSwapView;
+			_boosterSwapView.Init();
+			_boosterSwapView.OnBoosterClicked += HandleBoosterSwapClicked;
+			
+			_boosterBombView = boosterBombView;
+			_boosterBombView.Init();
+			_boosterBombView.OnBoosterClicked += HandleBoosterBombClicked;
+
 			_endGamePopup = endGamePopup;
 			_endGamePopup.gameObject.SetActive(false);
 			_endGamePopup.OnButtonClicked += HandleEndGamePopupButtonClicked;
 
-			_scoreCounter = new ScoreCounter();
-			_scoreCounter.Init(gameConfigData.TargetScore);
-			_scoreCounter.OnScoreChanged += HandleScoreChanged;
-			
 			_movesCounter = new MovesCounter();
 			_movesCounter.Init(gameConfigData.MaxMoves);
 			_movesCounter.OnMovesChanged += HandleMovesChanged;
+			
+			_scoreCounter = new ScoreCounter();
+			_scoreCounter.Init(gameConfigData.TargetScore);
+			_scoreCounter.OnScoreChanged += HandleScoreChanged;
+
+			_boosterSwap = new BoosterCounter();
+			_boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
+
+			_boosterBomb = new BoosterBombCounter();
+			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
+			_boosterBomb.OnBoosterUsed += HandleBoosterBombUsed;
+			
+			_movesView = movesView;
+			_scoreView = scoreView;
 
 			_maxShuffles = gameConfigData.MaxShuffles;
 			
-			UpdateScoreView(_scoreCounter.Score, _scoreCounter.TargetScore);
-			UpdateMovesView(_movesCounter.MovesLeft);
+			UpdateMovesView();
+			UpdateScoreView();
+			UpdateBoosterSwapView();
+			UpdateBoosterBombView();
 		}
 
 		private void HandleTileClick(int row, int column)
@@ -75,8 +110,18 @@ namespace Game.Controller
 			if (_gameFieldView.IsTileFalling(row, column))
 				return;
 			
-			List<Vector2Int> group = _gameField.GetTileGroup(row, column);
-			
+			List<Vector2Int> group;
+			switch (_interactionMode)
+			{
+				case InteractionMode.BoosterBomb:
+					group = _gameField.GetBoosterBombTileGroup(row, column, _boosterBomb.Radius);
+					break;
+				
+				default:
+					group = _gameField.GetCommonTileGroup(row, column);
+					break;
+			}
+
 			var groupWithoutFallingTiles = new List<Vector2Int>();
 			foreach (Vector2Int pos in group)
 			{
@@ -85,7 +130,7 @@ namespace Game.Controller
 			}
 			group = groupWithoutFallingTiles;
 
-			if (group.Count < 2)
+			if (_interactionMode == InteractionMode.Common && group.Count < 2)
 				return;
 
 			_gameField.RemoveTileGroup(group);
@@ -96,28 +141,72 @@ namespace Game.Controller
 
 			_scoreCounter.AddScoreForGroup(group.Count);
 			_movesCounter.MakeMove();
+
+			if (_interactionMode == InteractionMode.BoosterBomb)
+			{
+				_boosterBomb.Use();
+				_boosterBombView.Unselect();
+				_interactionMode = InteractionMode.Common;
+			}
+		}
+
+		private void HandleMovesChanged()
+		{
+			UpdateMovesView();
+			TryEndGame();
+		}
+
+		private void UpdateMovesView()
+		{
+			_movesView.UpdateMovesCount(_movesCounter.MovesLeft);
 		}
 		
-		private void HandleScoreChanged(int score, int targetScore)
+		private void HandleScoreChanged()
 		{
-			UpdateScoreView(score, targetScore);
+			UpdateScoreView();
 			TryEndGame();
 		}
 
-		private void UpdateScoreView(int score, int targetScore)
+		private void UpdateScoreView()
 		{
-			_gameFieldView.UpdateScoreCount(score, targetScore);
+			_scoreView.UpdateScoreCount(_scoreCounter.Score, _scoreCounter.TargetScore);
+		}
+		
+		private void HandleBoosterSwapClicked()
+		{
+			_interactionMode = _interactionMode != InteractionMode.BoosterSwap
+				? InteractionMode.BoosterSwap
+				: InteractionMode.Common;
 		}
 
-		private void HandleMovesChanged(int movesLeft)
+		private void UpdateBoosterSwapView()
 		{
-			UpdateMovesView(movesLeft);
-			TryEndGame();
+			_boosterSwapView.UpdateCount(_boosterSwap.Count);
+		}
+		
+		private void HandleBoosterBombClicked()
+		{
+			if (_boosterBomb.Count <= 0)
+				return;
+			
+			_interactionMode = _interactionMode != InteractionMode.BoosterBomb
+				? InteractionMode.BoosterBomb
+				: InteractionMode.Common;
+
+			if (_interactionMode == InteractionMode.BoosterBomb)
+				_boosterBombView.Select();
+			else
+				_boosterBombView.Unselect();
+		}
+		
+		private void UpdateBoosterBombView()
+		{
+			_boosterBombView.UpdateCount(_boosterBomb.Count);
 		}
 
-		private void UpdateMovesView(int movesLeft)
+		private void HandleBoosterBombUsed()
 		{
-			_gameFieldView.UpdateMovesCount(movesLeft);
+			UpdateBoosterBombView();
 		}
 		
 		private void TryEndGame()
@@ -246,11 +335,15 @@ namespace Game.Controller
 			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
 
-			_movesCounter.Reset();
-			_scoreCounter.Reset();
-			
-			UpdateScoreView(_scoreCounter.Score, _scoreCounter.TargetScore);
-			UpdateMovesView(_movesCounter.MovesLeft);
+			_movesCounter.Init(_movesCounter.MaxMoves);
+			_scoreCounter.Init(_scoreCounter.TargetScore);
+			_boosterBomb.Init(_boosterBomb.StartCount, _boosterBomb.Radius);
+			_boosterSwap.Init(_boosterSwap.StartCount);
+
+			UpdateScoreView();
+			UpdateMovesView();
+			UpdateBoosterSwapView();
+			UpdateBoosterBombView();
 			
 			_isShuffling = true;
 			_gameFieldView.ShuffleTiles();

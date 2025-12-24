@@ -20,17 +20,12 @@ namespace Game.View
 		[SerializeField] private RemoveTileAnimationConfig removeTileAnimationConfig;
 		[SerializeField] private FallTileAnimationConfig fallTileAnimationConfig;
 		[SerializeField] private ShuffleAnimationConfig shuffleAnimationConfig;
-		
-		[Space]
-		[SerializeField] private TextMeshProUGUI labelMoves;
-		[SerializeField] private TextMeshProUGUI labelScore;
 
 		public event Action<int, int> OnTileClickRequested;
 		public event Action FallCompleted;
 		public event Action ShuffleCompleted;
 		
 		private GameField _gameField;
-		
 		private TileViewLibrary _tileViewLibrary;
 		private TileView[,] _tiles;
 		private TileViewPool _tileViewPool;
@@ -210,16 +205,6 @@ namespace Game.View
 		public bool HasFallingTiles()
 		{
 			return _fallingTiles.Count > 0;
-		}
-
-		public void UpdateMovesCount(int movesLeft)
-		{
-			labelMoves.SetText(movesLeft.ToString());
-		}
-		
-		public void UpdateScoreCount(int score, int targetScore)
-		{
-			labelScore.SetText(score + "/" + targetScore);
 		}
 
 		private void RemoveTile(TileView tile)

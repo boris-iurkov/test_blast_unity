@@ -7,7 +7,7 @@ namespace Game.Model
 		public int TargetScore { get; private set; }
 		public int Score { get; private set; }
 		
-		public event Action<int, int> OnScoreChanged;
+		public event Action OnScoreChanged;
 
 		public void Init(int targetScore)
 		{
@@ -24,11 +24,6 @@ namespace Game.Model
 			FireScoreChanged();
 		}
 		
-		public void Reset()
-		{
-			Score = 0;
-		}
-		
 		private int GetScorePerTile(int groupSize)
 		{
 			if (groupSize < 1)
@@ -39,7 +34,7 @@ namespace Game.Model
 
 		private void FireScoreChanged()
 		{
-			OnScoreChanged?.Invoke(Score, TargetScore);
+			OnScoreChanged?.Invoke();
 		}
 	}
 }

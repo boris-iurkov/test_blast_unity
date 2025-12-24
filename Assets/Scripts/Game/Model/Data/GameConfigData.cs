@@ -7,5 +7,8 @@ namespace Game.Model.Data
 		public int TargetScore;
 		public int MaxMoves;
 		public int MaxShuffles;
+		public int BoosterSwapStartCount;
+		public int BoosterBombStartCount;
+		public int BoosterBombRadius;
 	}
 }

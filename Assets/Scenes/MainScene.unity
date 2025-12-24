@@ -691,6 +691,7 @@ GameObject:
   - component: {fileID: 615534634}
   - component: {fileID: 615534636}
   - component: {fileID: 615534635}
+  - component: {fileID: 615534637}
   m_Layer: 5
   m_Name: Score
   m_TagString: Untagged
@@ -757,6 +758,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 615534633}
   m_CullTransparentMesh: 1
+--- !u!114 &615534637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615534633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4220c42d9274429cacf8c5bb9c4791ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Blast.View::Game.View.ScoreView
+  labelCount: {fileID: 1091673186}
 --- !u!1 &727151813
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,6 +932,7 @@ GameObject:
   - component: {fileID: 936269085}
   - component: {fileID: 936269087}
   - component: {fileID: 936269086}
+  - component: {fileID: 936269088}
   m_Layer: 5
   m_Name: Moves
   m_TagString: Untagged
@@ -983,6 +998,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 936269084}
   m_CullTransparentMesh: 1
+--- !u!114 &936269088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936269084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 200cdefd0001419882092a6b2fee5afb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Blast.View::Game.View.MovesView
+  labelCount: {fileID: 18256395}
 --- !u!1 &1003125344
 GameObject:
   m_ObjectHideFlags: 0
@@ -1280,6 +1308,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 22538704}
     m_Modifications:
+    - target: {fileID: 1126690721456398181, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
+      propertyPath: boosterType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1748842074943272679, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1378,6 +1410,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8981345767553262865, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
   m_PrefabInstance: {fileID: 1255657696}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1255657698 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1126690721456398181, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
+  m_PrefabInstance: {fileID: 1255657696}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa80cdc65754920afba834a334e32ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Blast.View::Game.View.BoosterPanel
 --- !u!224 &1467209129 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8981345767553262865, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
@@ -1515,8 +1558,6 @@ MonoBehaviour:
   removeTileAnimationConfig: {fileID: 11400000, guid: dad814d998b599a459b16be99cc75f5f, type: 2}
   fallTileAnimationConfig: {fileID: 11400000, guid: cb90cf3382f7d324c96cb18f381c51a0, type: 2}
   shuffleAnimationConfig: {fileID: 11400000, guid: ca7fccf69af582a4bb9c94bede4ddcee, type: 2}
-  labelMoves: {fileID: 18256395}
-  labelScore: {fileID: 1091673186}
 --- !u!114 &1757941692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1816,6 +1857,10 @@ MonoBehaviour:
   gameConfig: {fileID: 11400000, guid: b77d3e0a4b7f0e842bf393a59e98d27d, type: 2}
   fieldConfig: {fileID: 11400000, guid: 2a4da4335e47bbc4b8a665a1f14f88a2, type: 2}
   gameFieldView: {fileID: 1757941691}
+  movesView: {fileID: 936269088}
+  scoreView: {fileID: 615534637}
+  boosterSwapView: {fileID: 6529908828703603702}
+  boosterBombView: {fileID: 1255657698}
   endGamePopup: {fileID: 2124363603}
   tileViewLibrary: {fileID: 11400000, guid: e9b3903b11eaeb145b9dc76a7dc7668d, type: 2}
   tileViewPool: {fileID: 359600685}
@@ -1842,9 +1887,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 22538704}
     m_Modifications:
+    - target: {fileID: 1126690721456398181, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
+      propertyPath: boosterType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3326481953426547730, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
       propertyPath: m_Name
-      value: BoosterTeleport
+      value: BoosterSwap
       objectReference: {fileID: 0}
     - target: {fileID: 8981345767553262865, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
       propertyPath: m_Pivot.x
@@ -1931,6 +1980,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
+--- !u!114 &6529908828703603702 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1126690721456398181, guid: a2069f0ecc89feb4392228d25515f58c, type: 3}
+  m_PrefabInstance: {fileID: 6529908828703603701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa80cdc65754920afba834a334e32ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Blast.View::Game.View.BoosterPanel
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

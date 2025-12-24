@@ -7,7 +7,7 @@ namespace Game.Model
 		public int MaxMoves { get; private set; }
 		public int MovesLeft { get; private set; }
 
-		public event Action<int> OnMovesChanged;
+		public event Action OnMovesChanged;
 
 		public void Init(int maxMoves)
 		{
@@ -25,14 +25,9 @@ namespace Game.Model
 			FireMovesChanged();
 		}
 
-		public void Reset()
-		{
-			MovesLeft = MaxMoves;
-		}
-
 		private void FireMovesChanged()
 		{
-			OnMovesChanged?.Invoke(MovesLeft);
+			OnMovesChanged?.Invoke();
 		}
 	}
 }

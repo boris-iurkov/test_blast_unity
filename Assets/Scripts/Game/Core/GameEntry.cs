@@ -17,6 +17,10 @@ namespace Game.Core
 		
 		[Space]
 		[SerializeField] private GameFieldView gameFieldView;
+		[SerializeField] private MovesView movesView;
+		[SerializeField] private ScoreView scoreView;
+		[SerializeField] private BoosterPanelView boosterSwapView;
+		[SerializeField] private BoosterPanelView boosterBombView;
 		[SerializeField] private EndGamePopup endGamePopup;
 		
 		[Space]
@@ -33,7 +37,10 @@ namespace Game.Core
 				ColumnsCount = gameConfig.columnsCount,
 				TargetScore = gameConfig.targetScore,
 				MaxMoves = gameConfig.maxMoves,
-				MaxShuffles = gameConfig.maxShuffles
+				MaxShuffles = gameConfig.maxShuffles,
+				BoosterSwapStartCount = gameConfig.boosterSwapStartCount,
+				BoosterBombStartCount = gameConfig.boosterBombStartCount,
+				BoosterBombRadius = gameConfig.boosterBombRadius
 			};
 			
 			var fieldConfigData = new FieldConfigData
@@ -47,6 +54,10 @@ namespace Game.Core
 			_gameController = new GameController();
 			_gameController.Init(
 				gameFieldView, 
+				movesView,
+				scoreView,
+				boosterSwapView,
+				boosterBombView,
 				endGamePopup,
 				tileViewLibrary, 
 				tileViewPool, 
