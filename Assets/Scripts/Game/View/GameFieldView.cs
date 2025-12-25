@@ -25,7 +25,6 @@ namespace Game.View
 		public event Action ShuffleCompleted;
 		public event Action SwapTilesCompleted;
 		
-		private GameField _gameField;
 		private TileViewLibrary _tileViewLibrary;
 		private TileView[,] _tiles;
 		private TileViewPool _tileViewPool;
@@ -34,30 +33,38 @@ namespace Game.View
 		private int _tileHeight;
 		private int _gameFieldWidth;
 		private int _gameFieldHeight;
+		private int _rowsCount;
+		private int _columnsCount;
 		
 		private int[] _spawnOffsetsPerColumn;
 		
 		private readonly HashSet<Vector2Int> _fallingTiles = new();
-		private int _currentFallPackCount = 0;
+		private int _currentFallPackCount;
 
 		public void Init(
-			GameField gameField, 
 			TileViewLibrary tileViewLibrary,
 			TileViewPool tileViewPool,
-			FieldConfigData configData)
+			FieldConfigData configData,
+			int rowsCount,
+			int columnsCount)
 		{
-			_gameField = gameField;
 			_tileViewLibrary = tileViewLibrary;
 			_tileViewPool = tileViewPool;
 			_tileWidth = configData.TileWidth;
 			_tileHeight = configData.TileHeight;
 			_gameFieldWidth = configData.GameFieldWidth;
 			_gameFieldHeight = configData.GameFieldHeight;
+			_rowsCount = rowsCount;
+			_columnsCount = columnsCount;
 			
-			_tiles = new TileView[_gameField.RowsCount, _gameField.ColumnsCount];
-			_spawnOffsetsPerColumn = new int[_gameField.ColumnsCount];
-
-			FillField();
+			_tiles = new TileView[_rowsCount, _columnsCount];
+			_spawnOffsetsPerColumn = new int[_columnsCount];
+		}
+		
+		public void FillTile(TileModel tile)
+		{
+			TileView tileView = CreateTile(tile.Row, tile.Column, tile.Color);
+			tileView.RectTransform.anchoredPosition = CalculateTilePosition(tile.Row, tile.Column);
 		}
 
 		public void RemoveTileGroup(List<Vector2Int> group)
@@ -72,7 +79,7 @@ namespace Game.View
 
 		public void FallTiles(List<TileFallData> fallTiles)
 		{
-			int maxRow = _gameField.RowsCount - 1;
+			int maxRow = _rowsCount - 1;
 			
 			_currentFallPackCount += fallTiles.Count;
 
@@ -80,13 +87,13 @@ namespace Game.View
 			{
 				TileView tile;
 
-				bool isNewTile = fallTile.From.x >= _gameField.RowsCount;
+				bool isNewTile = fallTile.From.x >= _rowsCount;
 
 				if (isNewTile)
 				{
-					tile = CreateTile(fallTile.Tile);
+					tile = CreateTile(fallTile.Tile.Row, fallTile.Tile.Column, fallTile.Tile.Color);
 					int additionalRow = _spawnOffsetsPerColumn[fallTile.Tile.Column];
-					tile.RectTransform.anchoredPosition = CalculateTilePosition(_gameField.RowsCount + additionalRow + 1, fallTile.From.y);
+					tile.RectTransform.anchoredPosition = CalculateTilePosition(_rowsCount + additionalRow + 1, fallTile.From.y);
 					_spawnOffsetsPerColumn[fallTile.Tile.Column]++;
 				}
 				else
@@ -133,9 +140,6 @@ namespace Game.View
 		
 		public void ShuffleTiles()
 		{
-			int rows = _gameField.RowsCount;
-			int columns = _gameField.ColumnsCount;
-			
 			var tilesList = new List<TileView>();
 			foreach (TileView tileView in _tiles)
 				tilesList.Add(tileView);
@@ -149,9 +153,9 @@ namespace Game.View
 			var index = 0;
 			var delay = 0f;
 			Sequence shuffleSequence = DOTween.Sequence();
-			for (var x = 0; x < rows; x++)
+			for (var x = 0; x < _rowsCount; x++)
 			{
-				for (var y = 0; y < columns; y++)
+				for (var y = 0; y < _columnsCount; y++)
 				{
 					TileView view = tilesList[index++];
 					Vector2 targetPos = CalculateTilePosition(x, y);
@@ -168,11 +172,11 @@ namespace Game.View
 			shuffleSequence.OnComplete(() =>
 			{
 				index = 0;
-				for (var row = 0; row < rows; row++)
-				for (var column = 0; column < columns; column++)
+				for (var row = 0; row < _rowsCount; row++)
+				for (var column = 0; column < _columnsCount; column++)
 				{
 					_tiles[row, column] = tilesList[index++];
-					_tiles[row, column].RectTransform.SetSiblingIndex(row * columns + column);
+					_tiles[row, column].RectTransform.SetSiblingIndex(row * _columnsCount + column);
 				}
 
 				ShuffleCompleted?.Invoke();
@@ -195,9 +199,9 @@ namespace Game.View
 
 		public TileColor[,] GetCurrentTileColors()
 		{
-			var colors = new TileColor[_gameField.RowsCount, _gameField.ColumnsCount];
-			for (var row = 0; row < _gameField.RowsCount; row++)
-			for (var column = 0; column < _gameField.ColumnsCount; column++)
+			var colors = new TileColor[_rowsCount, _columnsCount];
+			for (var row = 0; row < _rowsCount; row++)
+			for (var column = 0; column < _columnsCount; column++)
 				colors[row, column] = _tiles[row, column].Color;
 			return colors;
 		}
@@ -215,14 +219,14 @@ namespace Game.View
 		public void SelectTile(TileModel tile)
 		{
 			TileView tileView = _tiles[tile.Row, tile.Column];
-			tileView.RectTransform.DOKill(false);
+			tileView.RectTransform.DOKill();
 			tileView.RectTransform.DOScale(new Vector3(0.75f, 0.75f, 1f), 0.3f);
 		}
 
 		public void UnselectTile(TileModel tile)
 		{
 			TileView tileView = _tiles[tile.Row, tile.Column];
-			tileView.RectTransform.DOKill(false);
+			tileView.RectTransform.DOKill();
 			tileView.RectTransform.DOScale(Vector3.one, 0.3f);
 		}
 		
@@ -279,32 +283,14 @@ namespace Game.View
 			});
 		}
 
-		private void FillField()
+		private TileView CreateTile(int row, int column, TileColor color)
 		{
-			int rows = _gameField.Tiles.GetLength(0);
-			int columns = _gameField.Tiles.GetLength(1);
-			
-			for (var row = 0; row < rows; row++)
-			{
-				for (var column = 0; column < columns; column++)
-				{
-					TileModel tile = _gameField.Tiles[row, column];
-					TileView tileView = CreateTile(tile);
-					tileView.RectTransform.anchoredPosition = CalculateTilePosition(row, column);
-				}
-			}
-		}
+			Sprite sprite = _tileViewLibrary.GetSprite(color);
 
-		private TileView CreateTile(TileModel tile)
-		{
-			Sprite sprite = _tileViewLibrary.GetSprite(tile.Color);
-			int row = tile.Row;
-			int column = tile.Column;
-			
 			TileView tileView = _tileViewPool.GetTile();
 			tileView.transform.SetParent(tilesParent, false);
 
-			tileView.SetSprite(sprite, tile.Color);
+			tileView.SetSprite(sprite, color);
 			tileView.SetPositions(row, column);
 
 			tileView.Clicked += OnTileClicked;

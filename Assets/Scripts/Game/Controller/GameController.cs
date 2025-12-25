@@ -55,10 +55,16 @@ namespace Game.Controller
 			
 			_gameFieldView = gameFieldView;
 			_gameFieldView.Init(
-				_gameField, 
 				tileViewLibrary,
 				tileViewPool,
-				fieldConfigData);
+				fieldConfigData,
+				_gameField.RowsCount,
+				_gameField.ColumnsCount);
+			
+			for(var row = 0; row < _gameField.RowsCount; row++)
+			for (var column = 0; column < _gameField.ColumnsCount; column++)
+				_gameFieldView.FillTile(_gameField.Tiles[row, column]);
+			
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 			_gameFieldView.FallCompleted += HandleFallCompleted;
 			_gameFieldView.ShuffleCompleted += HandleShuffleCompleted;
