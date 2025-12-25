@@ -165,10 +165,14 @@ namespace Game.Controller
 			}
 
 			_gameField.RemoveTileGroup(group);
-			_gameFieldView.RemoveTileGroup(group);
+			_gameFieldView.RemoveTileGroup(group, row, column);
 
-			List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
-			_gameFieldView.FallTiles(fallingTiles);
+			float destroyDuration = _gameFieldView.GetDestroyGroupDuration(group, new Vector2Int(row, column), 0.05f);
+			DOVirtual.DelayedCall(destroyDuration, () =>
+			{
+				List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
+				_gameFieldView.FallTiles(fallingTiles);
+			});
 
 			if (_interactionMode == InteractionMode.BoosterBomb)
 				_scoreCounter.AddScoreForBomb(groupCount);

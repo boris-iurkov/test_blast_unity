@@ -67,14 +67,33 @@ namespace Game.View
 			tileView.RectTransform.anchoredPosition = CalculateTilePosition(tile.Row, tile.Column);
 		}
 
-		public void RemoveTileGroup(List<Vector2Int> group)
+		public void RemoveTileGroup(List<Vector2Int> group, int centerRow, int centerColumn)
 		{
-			foreach (Vector2Int positions in group)
+			const float stepDelay = 0.05f;
+
+			foreach (Vector2Int pos in group)
 			{
-				TileView tile = _tiles[positions.x, positions.y];
-				_tiles[positions.x, positions.y] = null;
-				RemoveTile(tile);
+				TileView tile = _tiles[pos.x, pos.y];
+				_tiles[pos.x, pos.y] = null;
+
+				int distance = Mathf.Abs(pos.x - centerRow) + Mathf.Abs(pos.y - centerColumn);
+				float delay = distance * stepDelay;
+
+				RemoveTile(tile, delay);
 			}
+		}
+		
+		public float GetDestroyGroupDuration(List<Vector2Int> group, Vector2Int origin, float stepDelay)
+		{
+			var maxDistance = 0;
+			foreach (Vector2Int pos in group)
+			{
+				int d = Mathf.Abs(pos.x - origin.x) + Mathf.Abs(pos.y - origin.y);
+				if (d > maxDistance)
+					maxDistance = d;
+			}
+
+			return maxDistance * stepDelay;
 		}
 
 		public void FallTiles(List<TileFallData> fallTiles)
@@ -262,20 +281,26 @@ namespace Game.View
 			});
 		}
 
-		private void RemoveTile(TileView tile)
+		private void RemoveTile(TileView tile, float delay)
 		{
 			Transform tileTransform = tile.transform;
 			tileTransform.DOKill();
 
 			Sequence sequence = DOTween.Sequence();
+			sequence.SetDelay(delay);
+
 			sequence.Append(
-				tileTransform.DOScale(removeTileAnimationConfig.scaleUp, removeTileAnimationConfig.scaleUpDuration)
+				tileTransform
+					.DOScale(removeTileAnimationConfig.scaleUp, removeTileAnimationConfig.scaleUpDuration)
 					.SetEase(removeTileAnimationConfig.scaleUpEase)
-				);
+			);
+
 			sequence.Append(
-				tileTransform.DOScale(0f, removeTileAnimationConfig.scaleDownDuration)
+				tileTransform
+					.DOScale(0f, removeTileAnimationConfig.scaleDownDuration)
 					.SetEase(removeTileAnimationConfig.scaleDownEase)
-				);
+			);
+
 			sequence.OnComplete(() =>
 			{
 				tile.Clicked -= OnTileClicked;
