@@ -82,8 +82,14 @@ namespace Game.View
 				}
 			}
 			
+			if (tilesParent != null)
+				tilesParent.DOKill();
+			
 			_fallingTiles.Clear();
 			_currentFallPackCount = 0;
+			
+			for (var i = 0; i < _spawnOffsetsPerColumn.Length; i++)
+				_spawnOffsetsPerColumn[i] = 0;
 		}
 
 		public void RemoveTileGroup(List<Vector2Int> group, int centerRow, int centerColumn)

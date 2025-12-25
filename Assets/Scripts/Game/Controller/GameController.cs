@@ -493,6 +493,8 @@ namespace Game.Controller
 
 		private void RestartGame()
 		{
+			DOTween.KillAll();
+			
 			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
 			_interactionMode = InteractionMode.Common;
