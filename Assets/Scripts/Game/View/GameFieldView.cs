@@ -187,6 +187,12 @@ namespace Game.View
 			_tiles[tile2.Row, tile2.Column].RectTransform.SetSiblingIndex(index1);
 		}
 
+		public void UpdateTileView(int row, int column, TileColor tileColor)
+		{
+			Sprite sprite = _tileViewLibrary.GetSprite(tileColor);
+			_tiles[row, column].SetSprite(sprite, tileColor);
+		}
+
 		public TileColor[,] GetCurrentTileColors()
 		{
 			var colors = new TileColor[_gameField.RowsCount, _gameField.ColumnsCount];

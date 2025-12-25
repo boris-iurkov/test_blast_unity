@@ -10,5 +10,6 @@ namespace Game.Model.Data
 		public int BoosterSwapStartCount;
 		public int BoosterBombStartCount;
 		public int BoosterBombRadius;
+		public int MinSuperTileGroupSize;
 	}
 }

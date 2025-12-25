@@ -6,6 +6,10 @@ namespace Game.Model.Data
 		Green,
 		Purple,
 		Red,
-		Yellow
+		Yellow,
+		RocketsHorizontal,
+		RocketsVertical,
+		BombSmall,
+		BombBig
 	}
 }

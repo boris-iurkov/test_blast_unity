@@ -40,7 +40,8 @@ namespace Game.Core
 				MaxShuffles = gameConfig.maxShuffles,
 				BoosterSwapStartCount = gameConfig.boosterSwapStartCount,
 				BoosterBombStartCount = gameConfig.boosterBombStartCount,
-				BoosterBombRadius = gameConfig.boosterBombRadius
+				BoosterBombRadius = gameConfig.boosterBombRadius,
+				MinSuperTileGroupSize = gameConfig.minSuperTileGroupSize
 			};
 			
 			var fieldConfigData = new FieldConfigData

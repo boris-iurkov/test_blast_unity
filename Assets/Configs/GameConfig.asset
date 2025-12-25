@@ -17,6 +17,7 @@ MonoBehaviour:
   targetScore: 3000
   maxMoves: 20
   maxShuffles: 3
-  boosterSwapStartCount: 7
+  boosterSwapStartCount: 10
   boosterBombStartCount: 5
   boosterBombRadius: 1
+  minSuperTileGroupSize: 5

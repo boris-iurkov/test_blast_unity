@@ -1,4 +1,3 @@
-using Game.Model;
 using Game.Model.Data;
 using UnityEngine;
 

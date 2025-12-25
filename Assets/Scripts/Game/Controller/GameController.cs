@@ -4,6 +4,7 @@ using Game.Controller.Data;
 using Game.Model;
 using Game.Model.Booster;
 using Game.Model.Data;
+using Game.Model.SuperTile;
 using Game.View;
 using Game.View.Data;
 using Game.View.Popup;
@@ -27,12 +28,12 @@ namespace Game.Controller
 		private BoosterPanelView _boosterBombView;
 		private EndGamePopup _endGamePopup;
 
-		private bool _isEndGame = false;
+		private bool _isEndGame;
 		private EndGameResult _endGameResult = EndGameResult.None;
 		
 		private int _maxShuffles;
-		private int _countShufflesMade = 0;
-		private bool _isShuffling = false;
+		private int _countShufflesMade;
+		private bool _isShuffling;
 
 		private InteractionMode _interactionMode = InteractionMode.Common;
 		private BoosterSwapController _boosterSwapController;
@@ -44,7 +45,7 @@ namespace Game.Controller
 			BoosterPanelView boosterSwapView,
 			BoosterPanelView boosterBombView,
 			EndGamePopup endGamePopup,
-			TileViewLibrary tileViewLibrary, 
+			TileViewLibrary tileViewLibrary,
 			TileViewPool tileViewPool, 
 			GameConfigData gameConfigData,
 			FieldConfigData fieldConfigData)
@@ -137,9 +138,21 @@ namespace Game.Controller
 					groupWithoutFallingTiles.Add(pos);
 			}
 			group = groupWithoutFallingTiles;
+			int groupCount = group.Count;
 
-			if (_interactionMode == InteractionMode.Common && group.Count < 2)
-				return;
+			if (_interactionMode == InteractionMode.Common)
+			{
+				if (groupCount < 2)
+					return;
+
+				if (groupCount >= _gameField.MinSuperTileGroupSize)
+				{
+					group.RemoveAll(tile => tile.x == row && tile.y == column);
+					ISuperTileLogic superTileLogic = GetRandomSuperTileLogic();
+					_gameField.SetSuperTileLogic(row, column, superTileLogic);
+					_gameFieldView.UpdateTileView(row, column, _gameField.Tiles[row, column].Color);
+				}
+			}
 
 			_gameField.RemoveTileGroup(group);
 			_gameFieldView.RemoveTileGroup(group);
@@ -148,9 +161,9 @@ namespace Game.Controller
 			_gameFieldView.FallTiles(fallingTiles);
 
 			if (_interactionMode == InteractionMode.BoosterBomb)
-				_scoreCounter.AddScoreForBomb(group.Count);
+				_scoreCounter.AddScoreForBomb(groupCount);
 			else
-				_scoreCounter.AddScoreForGroup(group.Count);
+				_scoreCounter.AddScoreForGroup(groupCount);
 			_movesCounter.MakeMove();
 			
 			if (_interactionMode == InteractionMode.BoosterBomb)
@@ -160,7 +173,26 @@ namespace Game.Controller
 			
 			_interactionMode = InteractionMode.Common;
 		}
-		
+
+		private ISuperTileLogic GetRandomSuperTileLogic()
+		{
+			int rnd = Random.Range(1, 5);
+			switch (rnd)
+			{
+				case 1:
+					return new SuperTileLogicRow();
+				
+				case 2:
+					return new SuperTileLogicColumn();
+				
+				case 3:
+					return new SuperTileLogicExplodeSmall();
+
+				default:
+					return new SuperTileLogicExplodeBig();
+			}
+		}
+
 		private void HandleMovesChanged()
 		{
 			UpdateMovesView();
@@ -194,17 +226,17 @@ namespace Game.Controller
 
 			UpdateSelectionsByInteractionMode();
 		}
-
-		private void UpdateBoosterSwapView()
-		{
-			_boosterSwapView.UpdateCount(_boosterSwap.Count);
-		}
 		
 		private void HandleBoosterSwapUsed()
 		{
 			UpdateBoosterSwapView();
 		}
-		
+
+		private void UpdateBoosterSwapView()
+		{
+			_boosterSwapView.UpdateCount(_boosterSwap.Count);
+		}
+
 		private void HandleBoosterBombClicked()
 		{
 			if (_boosterBomb.Count <= 0)
@@ -217,14 +249,14 @@ namespace Game.Controller
 			UpdateSelectionsByInteractionMode();
 		}
 		
-		private void UpdateBoosterBombView()
-		{
-			_boosterBombView.UpdateCount(_boosterBomb.Count);
-		}
-		
 		private void HandleBoosterBombUsed()
 		{
 			UpdateBoosterBombView();
+		}
+		
+		private void UpdateBoosterBombView()
+		{
+			_boosterBombView.UpdateCount(_boosterBomb.Count);
 		}
 
 		private void UpdateSelectionsByInteractionMode()
@@ -292,32 +324,6 @@ namespace Game.Controller
 			_interactionMode = InteractionMode.Common;
 			UpdateSelectionsByInteractionMode();
 		}
-		
-		private void TryEndGame()
-		{
-			if (_isEndGame)
-				return;
-			
-			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
-			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.Win;
-				return;
-			}
-			
-			if (_movesCounter.MovesLeft <= 0)
-			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.LoseNoMoves;
-				return;
-			}
-
-			if (_countShufflesMade >= _maxShuffles)
-			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.LoseNoTiles;
-			}
-		}
 
 		private void HandleFallCompleted()
 		{
@@ -327,20 +333,9 @@ namespace Game.Controller
 			TryEndGameByShuffle();
 		}
 
-		private void TryEndGameByShuffle()
-		{
-			ShuffleResult shuffleResult = TryShuffle();
-			if (shuffleResult == ShuffleResult.MaxShuffles)
-				TryEndGame();
-			
-			if (_isEndGame)
-				ShowEndGamePopup();
-		}
-
 		private ShuffleResult TryShuffle()
 		{
 			ShuffleResult shuffleResult = GetShuffleResult();
-
 			if (shuffleResult == ShuffleResult.NeedShuffle)
 			{
 				_isShuffling = true;
@@ -377,6 +372,42 @@ namespace Game.Controller
 			_isEndGame = false;
 
 			TryEndGameByShuffle();
+		}
+		
+		private void TryEndGameByShuffle()
+		{
+			ShuffleResult shuffleResult = TryShuffle();
+			if (shuffleResult == ShuffleResult.MaxShuffles)
+				TryEndGame();
+			
+			if (_isEndGame)
+				ShowEndGamePopup();
+		}
+		
+		private void TryEndGame()
+		{
+			if (_isEndGame)
+				return;
+			
+			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.Win;
+				return;
+			}
+			
+			if (_movesCounter.MovesLeft <= 0)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.LoseNoMoves;
+				return;
+			}
+
+			if (_countShufflesMade >= _maxShuffles)
+			{
+				_isEndGame = true;
+				_endGameResult = EndGameResult.LoseNoTiles;
+			}
 		}
 
 		private void ShowEndGamePopup()

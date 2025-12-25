@@ -1,4 +1,5 @@
 using Game.Model.Data;
+using Game.Model.SuperTile;
 
 namespace Game.Model
 {
@@ -7,6 +8,7 @@ namespace Game.Model
 		public TileColor Color { get; private set; }
 		public int Row { get; private set; }
 		public int Column { get; private set; }
+		public ISuperTileLogic SuperLogic { get; private set; }
 
 		public void SetColor(TileColor color)
 		{
@@ -17,6 +19,11 @@ namespace Game.Model
 		{
 			Row = row;
 			Column = column;
+		}
+
+		public void SetSuperTileLogic(ISuperTileLogic superLogic)
+		{
+			SuperLogic = superLogic;
 		}
 	}
 }

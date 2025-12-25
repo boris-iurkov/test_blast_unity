@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Game.Model.Data;
+using Game.Model.SuperTile;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -14,11 +16,13 @@ namespace Game.Model
 		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
 		public int ColumnsCount { get; private set; }
+		public int MinSuperTileGroupSize { get; private set; }
 
 		public void Init(GameConfigData configData)
 		{
 			RowsCount = configData.RowsCount;
 			ColumnsCount = configData.ColumnsCount;
+			MinSuperTileGroupSize = configData.MinSuperTileGroupSize;
 			
 			InitSourceColors();
 			InitStartTiles();
@@ -99,7 +103,7 @@ namespace Game.Model
 					int targetRow = RowsCount - emptyTiles + i;
 					int spawnRow = RowsCount + i + 1;
 
-					TileModel newTile = GetTileModel(targetRow, column);
+					TileModel newTile = CreateTileModel(targetRow, column);
 					_tiles[targetRow, column] = newTile;
 
 					result.Add(new TileFallData
@@ -166,6 +170,13 @@ namespace Game.Model
 			secondTile.SetPositions(row1, column1);
 		}
 
+		public void SetSuperTileLogic(int row, int column, ISuperTileLogic superTileLogic)
+		{
+			TileModel tile = _tiles[row, column];
+			tile.SetSuperTileLogic(superTileLogic);
+			tile.SetColor(superTileLogic.TileColor);
+		}
+
 		private bool IsTileInsideField(int row, int column)
 		{
 			return row >= 0 &&
@@ -176,7 +187,10 @@ namespace Game.Model
 
 		private void InitSourceColors()
 		{
-			_sourceColors = (TileColor[])Enum.GetValues(typeof(TileColor));
+			_sourceColors = Enum.GetValues(typeof(TileColor))
+				.Cast<TileColor>()
+				.Take(5)
+				.ToArray();
 		}
 
 		private void InitStartTiles()
@@ -187,13 +201,13 @@ namespace Game.Model
 			{
 				for (var column = 0; column < ColumnsCount; column++)
 				{
-					TileModel tile = GetTileModel(row, column);
+					TileModel tile = CreateTileModel(row, column);
 					_tiles[row, column] = tile;
 				}
 			}
 		}
 
-		private TileModel GetTileModel(int row, int column)
+		private TileModel CreateTileModel(int row, int column)
 		{
 			var tile = new TileModel();
 			tile.SetColor(GetRandomTileColor());
