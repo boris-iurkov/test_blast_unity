@@ -195,6 +195,45 @@ namespace Game.Model
 			tile.SetColor(superTileLogic.TileColor);
 		}
 
+		public void Reset()
+		{
+			for (var row = 0; row < RowsCount; row++)
+			for (var column = 0; column < ColumnsCount; column++)
+			{
+				if (_tiles[row, column] != null)
+				{
+					_pool.ReturnTile(_tiles[row, column]);
+					_tiles[row, column] = null;
+				}
+			}
+			
+			InitStartTiles();
+		}
+
+		public List<TileFallData> GetAllTilesFallData()
+		{
+			var result = new List<TileFallData>();
+			
+			for (var row = 0; row < RowsCount; row++)
+			for (var column = 0; column < ColumnsCount; column++)
+			{
+				TileModel tile = _tiles[row, column];
+				if (tile != null)
+				{
+					int spawnRow = RowsCount + row + 1;
+						
+					result.Add(new TileFallData
+					{
+						Tile = tile,
+						From = new Vector2Int(spawnRow, column),
+						To = new Vector2Int(row, column)
+					});
+				}
+			}
+			
+			return result;
+		}
+
 		private bool IsTileInsideField(int row, int column)
 		{
 			return row >= 0 &&

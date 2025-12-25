@@ -67,6 +67,25 @@ namespace Game.View
 			tileView.RectTransform.anchoredPosition = CalculateTilePosition(tile.Row, tile.Column);
 		}
 
+		public void ClearAllTiles()
+		{
+			for (var row = 0; row < _rowsCount; row++)
+			for (var column = 0; column < _columnsCount; column++)
+			{
+				if (_tiles[row, column] != null)
+				{
+					TileView tile = _tiles[row, column];
+					tile.Clicked -= OnTileClicked;
+					tile.RectTransform.DOKill();
+					_tileViewPool.ReturnTile(tile);
+					_tiles[row, column] = null;
+				}
+			}
+			
+			_fallingTiles.Clear();
+			_currentFallPackCount = 0;
+		}
+
 		public void RemoveTileGroup(List<Vector2Int> group, int centerRow, int centerColumn)
 		{
 			const float stepDelay = 0.05f;

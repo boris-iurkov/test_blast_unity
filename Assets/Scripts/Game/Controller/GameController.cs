@@ -507,8 +507,14 @@ namespace Game.Controller
 			UpdateBoosterSwapView();
 			UpdateBoosterBombView();
 			
-			_isShuffling = true;
-			_gameFieldView.ShuffleTiles();
+			_gameFieldView.ClearAllTiles();
+			_gameField.Reset();
+			
+			List<TileFallData> fallTiles = _gameField.GetAllTilesFallData();
+			_gameFieldView.FallTiles(fallTiles);
+			
+			_isEndGame = false;
+			_isShuffling = false;
 		}
 	}
 }
