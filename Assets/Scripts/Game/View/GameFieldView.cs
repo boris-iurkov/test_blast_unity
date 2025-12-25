@@ -66,7 +66,6 @@ namespace Game.View
 			{
 				TileView tile = _tiles[positions.x, positions.y];
 				_tiles[positions.x, positions.y] = null;
-				tile.SetClickable(false);
 				RemoveTile(tile);
 			}
 		}
@@ -107,7 +106,6 @@ namespace Game.View
 				_tiles[fallTile.To.x, fallTile.To.y] = tile;
 
 				tile.SetPositions(fallTile.To.x, fallTile.To.y);
-				tile.SetClickable(false);
 
 				_fallingTiles.Add(fallTile.To);
 
@@ -118,7 +116,6 @@ namespace Game.View
 					.OnComplete(() =>
 					{
 						_fallingTiles.Remove(fallTile.To);
-						tile.SetClickable(true);
 
 						if (isNewTile)
 							_spawnOffsetsPerColumn[fallTile.Tile.Column]--;
@@ -141,10 +138,7 @@ namespace Game.View
 			
 			var tilesList = new List<TileView>();
 			foreach (TileView tileView in _tiles)
-			{
 				tilesList.Add(tileView);
-				tileView.SetClickable(false);
-			}
 
 			for (int i = tilesList.Count - 1; i > 0; i--)
 			{
@@ -181,9 +175,6 @@ namespace Game.View
 					_tiles[row, column].RectTransform.SetSiblingIndex(row * columns + column);
 				}
 
-				foreach (TileView tileView in _tiles)
-					tileView.SetClickable(true);
-				
 				ShuffleCompleted?.Invoke();
 			});
 		}

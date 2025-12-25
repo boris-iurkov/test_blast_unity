@@ -17,7 +17,6 @@ namespace Game.View.Tile
 
 		private int _row;
 		private int _column;
-		private bool _clickable = true;
 
 		public void SetSprite(Sprite sprite, TileColor color)
 		{
@@ -30,17 +29,9 @@ namespace Game.View.Tile
 			_row = row;
 			_column = column;
 		}
-		
-		public void SetClickable(bool clickable)
-		{
-			_clickable = clickable;
-		}
 
 		public void OnPointerClick(PointerEventData eventData)
 		{
-			if (!_clickable)
-				return;
-			
 			Clicked?.Invoke(_row, _column);
 		}
 	}
