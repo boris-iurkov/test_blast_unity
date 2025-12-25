@@ -373,7 +373,11 @@ namespace Game.Controller
 			if (_gameFieldView.HasFallingTiles())
 				return;
 			
+			TryEndGame();
 			TryEndGameByShuffle();
+			
+			if (_isEndGame)
+				ShowEndGamePopup();
 		}
 
 		private ShuffleResult TryShuffle()

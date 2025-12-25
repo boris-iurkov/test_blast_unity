@@ -93,7 +93,18 @@ namespace Game.View
 			foreach (Vector2Int pos in group)
 			{
 				TileView tile = _tiles[pos.x, pos.y];
+				if (tile == null)
+					continue;
+				
 				_tiles[pos.x, pos.y] = null;
+				
+				bool wasFalling = _fallingTiles.Contains(pos);
+				if (wasFalling)
+				{
+					_fallingTiles.Remove(pos);
+					_currentFallPackCount--;
+					tile.RectTransform.DOKill();
+				}
 
 				int distance = Mathf.Abs(pos.x - centerRow) + Mathf.Abs(pos.y - centerColumn);
 				float delay = distance * stepDelay;
@@ -117,6 +128,13 @@ namespace Game.View
 
 		public void FallTiles(List<TileFallData> fallTiles)
 		{
+			if (fallTiles.Count == 0)
+			{
+				if (_currentFallPackCount == 0 && _fallingTiles.Count == 0)
+					FallCompleted?.Invoke();
+				return;
+			}
+			
 			int maxRow = _rowsCount - 1;
 			
 			_currentFallPackCount += fallTiles.Count;
