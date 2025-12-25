@@ -25,5 +25,10 @@ namespace Game.Model
 		{
 			SuperLogic = superLogic;
 		}
+		
+		public void Reset()
+		{
+			SuperLogic = null;
+		}
 	}
 }

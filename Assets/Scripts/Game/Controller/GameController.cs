@@ -115,6 +115,7 @@ namespace Game.Controller
 			    || _gameFieldView.IsTileFalling(row, column))
 				return;
 
+			bool isSuperTile = _gameField.Tiles[row, column].SuperLogic != null;
 			List<Vector2Int> group;
 			switch (_interactionMode)
 			{
@@ -127,7 +128,10 @@ namespace Game.Controller
 					break;
 				
 				default:
-					group = _gameField.GetCommonTileGroup(row, column);
+					if (isSuperTile)
+						group = _gameField.GetSuperTileGroup(row, column);
+					else
+						group = _gameField.GetCommonTileGroup(row, column);
 					break;
 			}
 
@@ -145,7 +149,7 @@ namespace Game.Controller
 				if (groupCount < 2)
 					return;
 
-				if (groupCount >= _gameField.MinSuperTileGroupSize)
+				if (groupCount >= _gameField.MinSuperTileGroupSize && !isSuperTile)
 				{
 					group.RemoveAll(tile => tile.x == row && tile.y == column);
 					ISuperTileLogic superTileLogic = GetRandomSuperTileLogic();

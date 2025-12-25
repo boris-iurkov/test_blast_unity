@@ -12,6 +12,7 @@ namespace Game.Model
 	{
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
+		private readonly TileModelPool _pool = new();
 
 		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
@@ -39,6 +40,12 @@ namespace Game.Model
 			return result;
 		}
 		
+		public List<Vector2Int> GetSuperTileGroup(int row, int column)
+		{
+			List<Vector2Int> result = _tiles[row, column].SuperLogic.GetAffectedTiles(_tiles, new Vector2Int(row, column));
+			return result;
+		}
+		
 		public List<Vector2Int> GetBoosterBombTileGroup(int row, int column, int radius)
 		{
 			var result = new List<Vector2Int>();
@@ -58,7 +65,10 @@ namespace Game.Model
 		public void RemoveTileGroup(List<Vector2Int> group)
 		{
 			foreach (Vector2Int positions in group)
+			{
+				_pool.ReturnTile(_tiles[positions.x, positions.y]);
 				_tiles[positions.x, positions.y] = null;
+			}
 		}
 
 		public List<TileFallData> ApplyFallTiles()
@@ -103,7 +113,9 @@ namespace Game.Model
 					int targetRow = RowsCount - emptyTiles + i;
 					int spawnRow = RowsCount + i + 1;
 
-					TileModel newTile = CreateTileModel(targetRow, column);
+					TileModel newTile = _pool.GetTile();
+					newTile.SetColor(GetRandomTileColor());
+					newTile.SetPositions(targetRow, column);
 					_tiles[targetRow, column] = newTile;
 
 					result.Add(new TileFallData
@@ -201,18 +213,12 @@ namespace Game.Model
 			{
 				for (var column = 0; column < ColumnsCount; column++)
 				{
-					TileModel tile = CreateTileModel(row, column);
+					TileModel tile = _pool.GetTile();
+					tile.SetColor(GetRandomTileColor());
+					tile.SetPositions(row, column);
 					_tiles[row, column] = tile;
 				}
 			}
-		}
-
-		private TileModel CreateTileModel(int row, int column)
-		{
-			var tile = new TileModel();
-			tile.SetColor(GetRandomTileColor());
-			tile.SetPositions(row, column);
-			return tile;
 		}
 
 		private TileColor GetRandomTileColor()
