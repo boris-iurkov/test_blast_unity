@@ -163,11 +163,13 @@ namespace Game.Controller
 					_gameFieldView.UpdateTileView(row, column, _gameField.Tiles[row, column].Color);
 				}
 			}
+			
+			List<Vector2Int> finalGroup = ActivateSuperTilesInGroup(group);
+			
+			_gameField.RemoveTileGroup(finalGroup);
+			_gameFieldView.RemoveTileGroup(finalGroup, row, column);
 
-			_gameField.RemoveTileGroup(group);
-			_gameFieldView.RemoveTileGroup(group, row, column);
-
-			float destroyDuration = _gameFieldView.GetDestroyGroupDuration(group, new Vector2Int(row, column), 0.05f);
+			float destroyDuration = _gameFieldView.GetDestroyGroupDuration(finalGroup, new Vector2Int(row, column), 0.05f);
 			DOVirtual.DelayedCall(destroyDuration, () =>
 			{
 				List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
@@ -191,6 +193,28 @@ namespace Game.Controller
 			_interactionMode = InteractionMode.Common;
 			
 			UpdateSelectionsByInteractionMode();
+		}
+
+		private List<Vector2Int> ActivateSuperTilesInGroup(List<Vector2Int> group)
+		{
+			var finalGroup = new HashSet<Vector2Int>(group);
+			
+			var superTilesToActivate = new List<Vector2Int>();
+			foreach (Vector2Int pos in group)
+			{
+				TileModel tile = _gameField.Tiles[pos.x, pos.y];
+				if (tile != null && tile.SuperLogic != null)
+					superTilesToActivate.Add(pos);
+			}
+			
+			foreach (Vector2Int superTilePos in superTilesToActivate)
+			{
+				List<Vector2Int> superTileGroup = _gameField.GetSuperTileGroup(superTilePos.x, superTilePos.y);
+				foreach (Vector2Int affectedPos in superTileGroup)
+					finalGroup.Add(affectedPos);
+			}
+			
+			return new List<Vector2Int>(finalGroup);
 		}
 
 		private ISuperTileLogic GetRandomSuperTileLogic()
