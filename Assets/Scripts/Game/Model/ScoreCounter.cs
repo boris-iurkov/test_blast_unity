@@ -17,19 +17,33 @@ namespace Game.Model
 
 		public void AddScoreForGroup(int groupSize)
 		{
-			int scorePerTile = GetScorePerTile(groupSize);
+			int scorePerTile = GetScorePerTileGroup(groupSize);
+			int totalScore = scorePerTile * groupSize;
+			Score += totalScore;
+			
+			FireScoreChanged();
+		}
+
+		public void AddScoreForBomb(int groupSize)
+		{
+			int scorePerTile = GetScorePerTileBomb();
 			int totalScore = scorePerTile * groupSize;
 			Score += totalScore;
 			
 			FireScoreChanged();
 		}
 		
-		private int GetScorePerTile(int groupSize)
+		private int GetScorePerTileGroup(int groupSize)
 		{
 			if (groupSize < 1)
 				return 0;
 
 			return 10 * (groupSize - 1);
+		}
+		
+		private int GetScorePerTileBomb()
+		{
+			return 20;
 		}
 
 		private void FireScoreChanged()

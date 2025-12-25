@@ -40,14 +40,12 @@ namespace Game.Model
 			var result = new List<Vector2Int>();
 
 			for (int r = row - radius; r <= row + radius; r++)
+			for (int c = column - radius; c <= column + radius; c++)
 			{
-				for (int c = column - radius; c <= column + radius; c++)
-				{
-					if (!IsTileInsideField(r, c))
-						continue;
+				if (!IsTileInsideField(r, c))
+					continue;
 
-					result.Add(new Vector2Int(r, c));
-				}
+				result.Add(new Vector2Int(r, c));
 			}
 
 			return result;
@@ -84,6 +82,8 @@ namespace Game.Model
 
 						_tiles[row, column] = null;
 						_tiles[to.x, to.y] = tile;
+						
+						tile.SetPositions(to.x, to.y);
 
 						result.Add(new TileFallData
 						{
@@ -148,6 +148,22 @@ namespace Game.Model
 			for (var row = 0; row < RowsCount; row++)
 			for (var column = 0; column < ColumnsCount; column++)
 				_tiles[row, column].SetColor(colors[row, column]);
+		}
+
+		public void SwapTiles(TileModel tile1, TileModel tile2)
+		{
+			int row1 = tile1.Row;
+			int column1 = tile1.Column;
+			int row2 = tile2.Row;
+			int column2 = tile2.Column;
+			
+			TileModel firstTile = _tiles[row1, column1];
+			TileModel secondTile = _tiles[row2, column2];
+			
+			(_tiles[row1, column1], _tiles[row2, column2]) = (_tiles[row2, column2], _tiles[row1, column1]);
+			
+			firstTile.SetPositions(row2, column2);
+			secondTile.SetPositions(row1, column1);
 		}
 
 		private bool IsTileInsideField(int row, int column)

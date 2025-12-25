@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Blast.Model::Game.Model.Config.GameConfig
   rowsCount: 9
   columnsCount: 9
-  targetScore: 2000
+  targetScore: 3000
   maxMoves: 20
   maxShuffles: 3
+  boosterSwapStartCount: 7
+  boosterBombStartCount: 5
+  boosterBombRadius: 1

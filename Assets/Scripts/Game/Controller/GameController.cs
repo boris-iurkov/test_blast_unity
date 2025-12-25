@@ -35,6 +35,7 @@ namespace Game.Controller
 		private bool _isShuffling = false;
 
 		private InteractionMode _interactionMode = InteractionMode.Common;
+		private BoosterSwapController _boosterSwapController;
 
 		public void Init(
 			GameFieldView gameFieldView,
@@ -60,6 +61,7 @@ namespace Game.Controller
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 			_gameFieldView.FallCompleted += HandleFallCompleted;
 			_gameFieldView.ShuffleCompleted += HandleShuffleCompleted;
+			_gameFieldView.SwapTilesCompleted += HandleSwapTilesCompleted;
 
 			_boosterSwapView = boosterSwapView;
 			_boosterSwapView.Init();
@@ -83,6 +85,7 @@ namespace Game.Controller
 
 			_boosterSwap = new BoosterCounter();
 			_boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
+			_boosterSwap.OnBoosterUsed += HandleBoosterSwapUsed;
 
 			_boosterBomb = new BoosterBombCounter();
 			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
@@ -92,7 +95,11 @@ namespace Game.Controller
 			_scoreView = scoreView;
 
 			_maxShuffles = gameConfigData.MaxShuffles;
-			
+
+			_boosterSwapController = new BoosterSwapController();
+			_boosterSwapController.OnTileSelected += HandleTileSelected;
+			_boosterSwapController.OnTileUnselected += HandleTileUnselected;
+
 			UpdateMovesView();
 			UpdateScoreView();
 			UpdateBoosterSwapView();
@@ -101,18 +108,19 @@ namespace Game.Controller
 
 		private void HandleTileClick(int row, int column)
 		{
-			if (_isEndGame)
+			if (_isEndGame
+			    || _isShuffling
+			    || _boosterSwapController.IsSwapping
+			    || _gameFieldView.IsTileFalling(row, column))
 				return;
 
-			if (_isShuffling)
-				return;
-
-			if (_gameFieldView.IsTileFalling(row, column))
-				return;
-			
 			List<Vector2Int> group;
 			switch (_interactionMode)
 			{
+				case InteractionMode.BoosterSwap:
+					_boosterSwapController.OnTileClicked(_gameField.Tiles[row, column]);
+					return;
+
 				case InteractionMode.BoosterBomb:
 					group = _gameField.GetBoosterBombTileGroup(row, column, _boosterBomb.Radius);
 					break;
@@ -139,17 +147,20 @@ namespace Game.Controller
 			List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
 			_gameFieldView.FallTiles(fallingTiles);
 
-			_scoreCounter.AddScoreForGroup(group.Count);
-			_movesCounter.MakeMove();
-
 			if (_interactionMode == InteractionMode.BoosterBomb)
-			{
+				_scoreCounter.AddScoreForBomb(group.Count);
+			else
+				_scoreCounter.AddScoreForGroup(group.Count);
+			_movesCounter.MakeMove();
+			
+			if (_interactionMode == InteractionMode.BoosterBomb)
 				_boosterBomb.Use();
-				_boosterBombView.Unselect();
-				_interactionMode = InteractionMode.Common;
-			}
-		}
 
+			UpdateSelectionsByInteractionMode();
+			
+			_interactionMode = InteractionMode.Common;
+		}
+		
 		private void HandleMovesChanged()
 		{
 			UpdateMovesView();
@@ -174,14 +185,24 @@ namespace Game.Controller
 		
 		private void HandleBoosterSwapClicked()
 		{
+			if (_boosterSwap.Count <= 0)
+				return;
+			
 			_interactionMode = _interactionMode != InteractionMode.BoosterSwap
 				? InteractionMode.BoosterSwap
 				: InteractionMode.Common;
+
+			UpdateSelectionsByInteractionMode();
 		}
 
 		private void UpdateBoosterSwapView()
 		{
 			_boosterSwapView.UpdateCount(_boosterSwap.Count);
+		}
+		
+		private void HandleBoosterSwapUsed()
+		{
+			UpdateBoosterSwapView();
 		}
 		
 		private void HandleBoosterBombClicked()
@@ -192,21 +213,84 @@ namespace Game.Controller
 			_interactionMode = _interactionMode != InteractionMode.BoosterBomb
 				? InteractionMode.BoosterBomb
 				: InteractionMode.Common;
-
-			if (_interactionMode == InteractionMode.BoosterBomb)
-				_boosterBombView.Select();
-			else
-				_boosterBombView.Unselect();
+			
+			UpdateSelectionsByInteractionMode();
 		}
 		
 		private void UpdateBoosterBombView()
 		{
 			_boosterBombView.UpdateCount(_boosterBomb.Count);
 		}
-
+		
 		private void HandleBoosterBombUsed()
 		{
 			UpdateBoosterBombView();
+		}
+
+		private void UpdateSelectionsByInteractionMode()
+		{
+			switch (_interactionMode)
+			{
+				case InteractionMode.BoosterSwap:
+					_boosterSwapView.Select();
+					_boosterBombView.Unselect();
+					break;
+				
+				case InteractionMode.BoosterBomb:
+					_boosterSwapView.Unselect();
+					_boosterBombView.Select();
+					break;
+				
+				default:
+					_boosterSwapView.Unselect();
+					_boosterBombView.Unselect();
+					break;
+			}
+			
+			if (_interactionMode != InteractionMode.BoosterSwap)
+			{
+				TileModel firstTile = _boosterSwapController.FirstSelected;
+				if (firstTile != null)
+					_gameFieldView.UnselectTile(firstTile);
+				_boosterSwapController.Reset();
+			}
+		}
+
+		private void HandleTileSelected(TileModel tile)
+		{
+			_gameFieldView.SelectTile(tile);
+			if (_boosterSwapController.SecondSelected != null)
+			{
+				TileModel firstTile = _boosterSwapController.FirstSelected;
+				TileModel secondTile = _boosterSwapController.SecondSelected;
+
+				_gameFieldView.UnselectTile(firstTile);
+				_gameFieldView.UnselectTile(secondTile);
+				
+				_gameFieldView.SwapTiles(firstTile, secondTile);
+				_gameField.SwapTiles(firstTile, secondTile);
+				
+				_boosterSwap.Use();
+			}
+		}
+		
+		private void HandleTileUnselected(TileModel tile)
+		{
+			_gameFieldView.UnselectTile(tile);
+		}
+
+		private void HandleSwapTilesCompleted()
+		{
+			_gameFieldView.UpdateTileLayers(_boosterSwapController.FirstSelected, _boosterSwapController.SecondSelected);
+			
+			_boosterSwapController.Reset();
+
+			TileColor[,] colors = _gameFieldView.GetCurrentTileColors();
+			_gameField.SetColors(colors);
+			
+			_boosterSwapController.Reset();
+			_interactionMode = InteractionMode.Common;
+			UpdateSelectionsByInteractionMode();
 		}
 		
 		private void TryEndGame()
@@ -237,14 +321,10 @@ namespace Game.Controller
 
 		private void HandleFallCompleted()
 		{
-
 			if (_gameFieldView.HasFallingTiles())
 				return;
 			
 			TryEndGameByShuffle();
-
-			if (_isEndGame)
-				ShowEndGamePopup();
 		}
 
 		private void TryEndGameByShuffle()
@@ -252,6 +332,9 @@ namespace Game.Controller
 			ShuffleResult shuffleResult = TryShuffle();
 			if (shuffleResult == ShuffleResult.MaxShuffles)
 				TryEndGame();
+			
+			if (_isEndGame)
+				ShowEndGamePopup();
 		}
 
 		private ShuffleResult TryShuffle()
@@ -334,6 +417,11 @@ namespace Game.Controller
 		{
 			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
+			_interactionMode = InteractionMode.Common;
+			_boosterSwapController.Reset();
+			
+			_boosterBombView.Unselect();
+			_boosterSwapView.Unselect();
 
 			_movesCounter.Init(_movesCounter.MaxMoves);
 			_scoreCounter.Init(_scoreCounter.TargetScore);

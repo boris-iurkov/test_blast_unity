@@ -15,11 +15,6 @@ namespace Game.Model.Booster
 			Count = startCount;
 		}
 
-		public void SetCount(int count)
-		{
-			Count = count;
-		}
-
 		public void Use()
 		{
 			if (Count <= 0)

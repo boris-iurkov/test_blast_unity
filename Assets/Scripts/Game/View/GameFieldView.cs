@@ -6,7 +6,6 @@ using Game.Model.Data;
 using Game.View.Config;
 using Game.View.Data;
 using Game.View.Tile;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -24,6 +23,7 @@ namespace Game.View
 		public event Action<int, int> OnTileClickRequested;
 		public event Action FallCompleted;
 		public event Action ShuffleCompleted;
+		public event Action SwapTilesCompleted;
 		
 		private GameField _gameField;
 		private TileViewLibrary _tileViewLibrary;
@@ -188,6 +188,14 @@ namespace Game.View
 			});
 		}
 
+		public void UpdateTileLayers(TileModel tile1, TileModel tile2)
+		{
+			int index1 = _tiles[tile1.Row, tile1.Column].transform.GetSiblingIndex();
+			int index2 = _tiles[tile2.Row, tile2.Column].transform.GetSiblingIndex();
+			_tiles[tile1.Row, tile1.Column].RectTransform.SetSiblingIndex(index2);
+			_tiles[tile2.Row, tile2.Column].RectTransform.SetSiblingIndex(index1);
+		}
+
 		public TileColor[,] GetCurrentTileColors()
 		{
 			var colors = new TileColor[_gameField.RowsCount, _gameField.ColumnsCount];
@@ -207,6 +215,52 @@ namespace Game.View
 			return _fallingTiles.Count > 0;
 		}
 
+		public void SelectTile(TileModel tile)
+		{
+			TileView tileView = _tiles[tile.Row, tile.Column];
+			tileView.RectTransform.DOKill(false);
+			tileView.RectTransform.DOScale(new Vector3(0.75f, 0.75f, 1f), 0.3f);
+		}
+
+		public void UnselectTile(TileModel tile)
+		{
+			TileView tileView = _tiles[tile.Row, tile.Column];
+			tileView.RectTransform.DOKill(false);
+			tileView.RectTransform.DOScale(Vector3.one, 0.3f);
+		}
+		
+		public void SwapTiles(TileModel tile1, TileModel tile2)
+		{
+			int row1 = tile1.Row;
+			int column1 = tile1.Column;
+			int row2 = tile2.Row;
+			int column2 = tile2.Column;
+
+			TileView firstTile = _tiles[row1, column1];
+			TileView secondTile = _tiles[row2, column2];
+
+			(_tiles[row1, column1], _tiles[row2, column2]) = (_tiles[row2, column2], _tiles[row1, column1]);
+			
+			firstTile.SetPositions(row2, column2);
+			secondTile.SetPositions(row1, column1);
+			
+			Vector2 targetFirstTile = CalculateTilePosition(row2, column2);
+			Vector2 targetSecondTile = CalculateTilePosition(row1, column1);
+
+			float distance = Vector2.Distance(targetFirstTile, targetSecondTile);
+			float duration = distance / shuffleAnimationConfig.speed;
+
+			Sequence swapSequence = DOTween.Sequence();
+			swapSequence.Insert(0, _tiles[row1, column1].RectTransform.DOLocalMove(targetSecondTile, duration)
+					.SetEase(shuffleAnimationConfig.moveEase));
+			swapSequence.Insert(0, _tiles[row2, column2].RectTransform.DOLocalMove(targetFirstTile, duration)
+					.SetEase(shuffleAnimationConfig.moveEase));
+			swapSequence.OnComplete(() =>
+			{
+				SwapTilesCompleted?.Invoke();
+			});
+		}
+
 		private void RemoveTile(TileView tile)
 		{
 			Transform tileTransform = tile.transform;
@@ -223,6 +277,7 @@ namespace Game.View
 				);
 			sequence.OnComplete(() =>
 			{
+				tile.Clicked -= OnTileClicked;
 				_tileViewPool.ReturnTile(tile);
 			});
 		}
