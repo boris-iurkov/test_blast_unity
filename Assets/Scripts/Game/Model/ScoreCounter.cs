@@ -26,7 +26,7 @@ namespace Game.Model
 		
 		public void AddScoreForSuperTile(int groupSize)
 		{
-			int scorePerTile = GetScorePerSuperTile(groupSize);
+			int scorePerTile = GetScorePerSuperTile();
 			int totalScore = scorePerTile * groupSize;
 			Score += totalScore;
 			
@@ -50,9 +50,9 @@ namespace Game.Model
 			return 10 * (groupSize - 1);
 		}
 		
-		private int GetScorePerSuperTile(int groupSize)
+		private int GetScorePerSuperTile()
 		{
-			return 10 * groupSize;
+			return 20;
 		}
 		
 		private int GetScorePerTileBomb()
