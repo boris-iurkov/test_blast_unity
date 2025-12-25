@@ -184,9 +184,9 @@ namespace Game.Controller
 			if (_interactionMode == InteractionMode.BoosterBomb)
 				_boosterBomb.Use();
 
-			UpdateSelectionsByInteractionMode();
-			
 			_interactionMode = InteractionMode.Common;
+			
+			UpdateSelectionsByInteractionMode();
 		}
 
 		private ISuperTileLogic GetRandomSuperTileLogic()
