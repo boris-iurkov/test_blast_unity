@@ -11,5 +11,6 @@ namespace Game.Model.Data
 		public int BoosterBombStartCount;
 		public int BoosterBombRadius;
 		public int MinSuperTileGroupSize;
+		public int RadiusSuperTileBombSmall;
 	}
 }

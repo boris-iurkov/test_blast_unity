@@ -167,7 +167,12 @@ namespace Game.Controller
 			if (_interactionMode == InteractionMode.BoosterBomb)
 				_scoreCounter.AddScoreForBomb(groupCount);
 			else
-				_scoreCounter.AddScoreForGroup(groupCount);
+			{
+				if (isSuperTile)
+					_scoreCounter.AddScoreForSuperTile(groupCount);
+				else
+					_scoreCounter.AddScoreForGroup(groupCount);
+			}
 			_movesCounter.MakeMove();
 			
 			if (_interactionMode == InteractionMode.BoosterBomb)

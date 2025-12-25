@@ -21,3 +21,4 @@ MonoBehaviour:
   boosterBombStartCount: 5
   boosterBombRadius: 1
   minSuperTileGroupSize: 5
+  radiusSuperTileBombSmall: 2

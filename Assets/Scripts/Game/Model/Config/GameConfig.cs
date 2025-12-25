@@ -14,5 +14,6 @@ namespace Game.Model.Config
 		public int boosterBombStartCount = 5;
 		public int boosterBombRadius = 1;
 		public int minSuperTileGroupSize = 5;
+		public int radiusSuperTileBombSmall = 2;
 	}
 }

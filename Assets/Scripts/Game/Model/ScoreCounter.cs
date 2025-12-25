@@ -23,6 +23,15 @@ namespace Game.Model
 			
 			FireScoreChanged();
 		}
+		
+		public void AddScoreForSuperTile(int groupSize)
+		{
+			int scorePerTile = GetScorePerSuperTile(groupSize);
+			int totalScore = scorePerTile * groupSize;
+			Score += totalScore;
+			
+			FireScoreChanged();
+		}
 
 		public void AddScoreForBomb(int groupSize)
 		{
@@ -39,6 +48,11 @@ namespace Game.Model
 				return 0;
 
 			return 10 * (groupSize - 1);
+		}
+		
+		private int GetScorePerSuperTile(int groupSize)
+		{
+			return 10 * groupSize;
 		}
 		
 		private int GetScorePerTileBomb()

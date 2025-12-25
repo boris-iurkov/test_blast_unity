@@ -18,12 +18,14 @@ namespace Game.Model
 		public int RowsCount { get; private set; }
 		public int ColumnsCount { get; private set; }
 		public int MinSuperTileGroupSize { get; private set; }
+		public int RadiusSuperTileBombSmall { get; private set; }
 
 		public void Init(GameConfigData configData)
 		{
 			RowsCount = configData.RowsCount;
 			ColumnsCount = configData.ColumnsCount;
 			MinSuperTileGroupSize = configData.MinSuperTileGroupSize;
+			RadiusSuperTileBombSmall = configData.RadiusSuperTileBombSmall;
 			
 			InitSourceColors();
 			InitStartTiles();
@@ -42,7 +44,11 @@ namespace Game.Model
 		
 		public List<Vector2Int> GetSuperTileGroup(int row, int column)
 		{
-			List<Vector2Int> result = _tiles[row, column].SuperLogic.GetAffectedTiles(_tiles, new Vector2Int(row, column));
+			ISuperTileLogic logic = _tiles[row, column].SuperLogic;
+			if (logic is SuperTileLogicExplodeSmall explodeSmall)
+				explodeSmall.Init(RadiusSuperTileBombSmall);
+			
+			List<Vector2Int> result = logic.GetAffectedTiles(_tiles, new Vector2Int(row, column));
 			return result;
 		}
 		

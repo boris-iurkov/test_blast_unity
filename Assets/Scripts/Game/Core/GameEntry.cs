@@ -41,7 +41,8 @@ namespace Game.Core
 				BoosterSwapStartCount = gameConfig.boosterSwapStartCount,
 				BoosterBombStartCount = gameConfig.boosterBombStartCount,
 				BoosterBombRadius = gameConfig.boosterBombRadius,
-				MinSuperTileGroupSize = gameConfig.minSuperTileGroupSize
+				MinSuperTileGroupSize = gameConfig.minSuperTileGroupSize,
+				RadiusSuperTileBombSmall = gameConfig.radiusSuperTileBombSmall
 			};
 			
 			var fieldConfigData = new FieldConfigData
