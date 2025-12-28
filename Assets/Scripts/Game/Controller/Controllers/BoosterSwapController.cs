@@ -2,7 +2,7 @@ using System;
 using Game.Model;
 using UnityEngine;
 
-namespace Game.Controller
+namespace Game.Controller.Controllers
 {
 	public class BoosterSwapController
 	{

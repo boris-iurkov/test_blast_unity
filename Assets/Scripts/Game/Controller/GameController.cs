@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DG.Tweening;
+using Game.Controller.Controllers;
 using Game.Controller.Data;
 using Game.Controller.Factory;
 using Game.Model;
@@ -23,11 +24,12 @@ namespace Game.Controller
 		private BoosterBombCounter _boosterBomb;
 
 		private GameFieldView _gameFieldView;
-		private MovesView _movesView;
-		private ScoreView _scoreView;
 		private BoosterPanelView _boosterSwapView;
 		private BoosterPanelView _boosterBombView;
 		private EndGamePopup _endGamePopup;
+		
+		private BoosterSwapController _boosterSwapController;
+		private ViewController _viewController;
 
 		private bool _isEndGame;
 		private EndGameResult _endGameResult = EndGameResult.None;
@@ -37,7 +39,6 @@ namespace Game.Controller
 		private bool _isShuffling;
 
 		private InteractionMode _interactionMode = InteractionMode.Common;
-		private BoosterSwapController _boosterSwapController;
 		private SuperTileFactory _superTileFactory;
 
 		public void Init(
@@ -99,9 +100,6 @@ namespace Game.Controller
 			_boosterBomb = new BoosterBombCounter();
 			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
 			_boosterBomb.OnBoosterUsed += HandleBoosterBombUsed;
-			
-			_movesView = movesView;
-			_scoreView = scoreView;
 
 			_maxShuffles = gameConfigData.MaxShuffles;
 
@@ -111,10 +109,9 @@ namespace Game.Controller
 			_boosterSwapController.OnTileSelected += HandleTileSelected;
 			_boosterSwapController.OnTileUnselected += HandleTileUnselected;
 
-			UpdateMovesView();
-			UpdateScoreView();
-			UpdateBoosterSwapView();
-			UpdateBoosterBombView();
+			_viewController = new ViewController();
+			_viewController.Init(movesView, scoreView, boosterSwapView, boosterBombView, _movesCounter, _scoreCounter, _boosterSwap, _boosterBomb);
+			_viewController.UpdateAllViews();
 		}
 
 		private void HandleTileClick(int row, int column)
@@ -223,24 +220,14 @@ namespace Game.Controller
 
 		private void HandleMovesChanged()
 		{
-			UpdateMovesView();
+			_viewController.UpdateMovesView();
 			TryEndGame();
-		}
-
-		private void UpdateMovesView()
-		{
-			_movesView.UpdateMovesCount(_movesCounter.MovesLeft);
 		}
 		
 		private void HandleScoreChanged()
 		{
-			UpdateScoreView();
+			_viewController.UpdateScoreView();
 			TryEndGame();
-		}
-
-		private void UpdateScoreView()
-		{
-			_scoreView.UpdateScoreCount(_scoreCounter.Score, _scoreCounter.TargetScore);
 		}
 		
 		private void HandleBoosterSwapClicked()
@@ -257,12 +244,7 @@ namespace Game.Controller
 		
 		private void HandleBoosterSwapUsed()
 		{
-			UpdateBoosterSwapView();
-		}
-
-		private void UpdateBoosterSwapView()
-		{
-			_boosterSwapView.UpdateCount(_boosterSwap.Count);
+			_viewController.UpdateBoosterSwapView();
 		}
 
 		private void HandleBoosterBombClicked()
@@ -279,12 +261,7 @@ namespace Game.Controller
 		
 		private void HandleBoosterBombUsed()
 		{
-			UpdateBoosterBombView();
-		}
-		
-		private void UpdateBoosterBombView()
-		{
-			_boosterBombView.UpdateCount(_boosterBomb.Count);
+			_viewController.UpdateBoosterBombView();
 		}
 
 		private void UpdateSelectionsByInteractionMode()
@@ -292,18 +269,18 @@ namespace Game.Controller
 			switch (_interactionMode)
 			{
 				case InteractionMode.BoosterSwap:
-					_boosterSwapView.Select();
-					_boosterBombView.Unselect();
+					_viewController.UpdateBoosterSwapSelection(true);
+					_viewController.UpdateBoosterBombSelection(false);
 					break;
 				
 				case InteractionMode.BoosterBomb:
-					_boosterSwapView.Unselect();
-					_boosterBombView.Select();
+					_viewController.UpdateBoosterSwapSelection(false);
+					_viewController.UpdateBoosterBombSelection(true);
 					break;
 				
 				default:
-					_boosterSwapView.Unselect();
-					_boosterBombView.Unselect();
+					_viewController.UpdateBoosterSwapSelection(false);
+					_viewController.UpdateBoosterBombSelection(false);
 					break;
 			}
 			
@@ -485,18 +462,14 @@ namespace Game.Controller
 			_interactionMode = InteractionMode.Common;
 			_boosterSwapController.Reset();
 			
-			_boosterBombView.Unselect();
-			_boosterSwapView.Unselect();
+			_viewController.UnselectAllBoosters();
 
 			_movesCounter.Init(_movesCounter.MaxMoves);
 			_scoreCounter.Init(_scoreCounter.TargetScore);
 			_boosterBomb.Init(_boosterBomb.StartCount, _boosterBomb.Radius);
 			_boosterSwap.Init(_boosterSwap.StartCount);
 
-			UpdateScoreView();
-			UpdateMovesView();
-			UpdateBoosterSwapView();
-			UpdateBoosterBombView();
+			_viewController.UpdateAllViews();
 			
 			_gameFieldView.ClearAllTiles();
 			_gameField.Reset();
