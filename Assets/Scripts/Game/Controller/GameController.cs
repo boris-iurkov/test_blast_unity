@@ -30,9 +30,7 @@ namespace Game.Controller
 		
 		private BoosterSwapController _boosterSwapController;
 		private ViewController _viewController;
-
-		private bool _isEndGame;
-		private EndGameResult _endGameResult = EndGameResult.None;
+		private EndGameController _endGameController;
 		
 		private int _maxShuffles;
 		private int _countShufflesMade;
@@ -82,8 +80,6 @@ namespace Game.Controller
 			_boosterBombView.OnBoosterClicked += HandleBoosterBombClicked;
 
 			_endGamePopup = endGamePopup;
-			_endGamePopup.gameObject.SetActive(false);
-			_endGamePopup.OnButtonClicked += HandleEndGamePopupButtonClicked;
 
 			_movesCounter = new MovesCounter();
 			_movesCounter.Init(gameConfigData.MaxMoves);
@@ -92,6 +88,10 @@ namespace Game.Controller
 			_scoreCounter = new ScoreCounter();
 			_scoreCounter.Init(gameConfigData.TargetScore);
 			_scoreCounter.OnScoreChanged += HandleScoreChanged;
+			
+			_endGameController = new EndGameController();
+			_endGameController.Init(_scoreCounter, _movesCounter, _endGamePopup, gameConfigData.MaxShuffles);
+			_endGameController.OnRestartRequested += RestartGame;
 
 			_boosterSwap = new BoosterCounter();
 			_boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
@@ -116,7 +116,7 @@ namespace Game.Controller
 
 		private void HandleTileClick(int row, int column)
 		{
-			if (_isEndGame
+			if (_endGameController.IsEndGame
 			    || _isShuffling
 			    || _boosterSwapController.IsSwapping
 			    || _gameFieldView.IsTileFalling(row, column))
@@ -221,13 +221,13 @@ namespace Game.Controller
 		private void HandleMovesChanged()
 		{
 			_viewController.UpdateMovesView();
-			TryEndGame();
+			_endGameController.TryEndGame();
 		}
 		
 		private void HandleScoreChanged()
 		{
 			_viewController.UpdateScoreView();
-			TryEndGame();
+			_endGameController.TryEndGame();
 		}
 		
 		private void HandleBoosterSwapClicked()
@@ -335,11 +335,8 @@ namespace Game.Controller
 			if (_gameFieldView.HasFallingTiles())
 				return;
 			
-			TryEndGame();
+			_endGameController.TryEndGame();
 			TryEndGameByShuffle();
-			
-			if (_isEndGame)
-				ShowEndGamePopup();
 		}
 
 		private ShuffleResult TryShuffle()
@@ -360,7 +357,7 @@ namespace Game.Controller
 
 		private ShuffleResult GetShuffleResult()
 		{
-			if (_isEndGame)
+			if (_endGameController.IsEndGame)
 				return ShuffleResult.EndGame;
 
 			if (_gameField.HasAnyAvailableGroup())
@@ -378,7 +375,7 @@ namespace Game.Controller
 			_gameField.SetColors(colors);
 
 			_isShuffling = false;
-			_isEndGame = false;
+			_endGameController.Reset();
 
 			TryEndGameByShuffle();
 		}
@@ -387,80 +384,23 @@ namespace Game.Controller
 		{
 			ShuffleResult shuffleResult = TryShuffle();
 			if (shuffleResult == ShuffleResult.MaxShuffles)
-				TryEndGame();
-			
-			if (_isEndGame)
-				ShowEndGamePopup();
-		}
-		
-		private void TryEndGame()
-		{
-			if (_isEndGame)
-				return;
-			
-			if (_scoreCounter.Score >= _scoreCounter.TargetScore)
 			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.Win;
-				return;
+				_endGameController.SetShufflesCount(_countShufflesMade);
+				_endGameController.TryEndGame();
 			}
 			
-			if (_movesCounter.MovesLeft <= 0)
-			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.LoseNoMoves;
-				return;
-			}
-
-			if (_countShufflesMade >= _maxShuffles)
-			{
-				_isEndGame = true;
-				_endGameResult = EndGameResult.LoseNoTiles;
-			}
-		}
-
-		private void ShowEndGamePopup()
-		{
-			_endGamePopup.gameObject.SetActive(true);
-			EndGamePopupState state = GetEndGamePopupState(_endGameResult);
-			_endGamePopup.Show(state);
-		}
-
-		private EndGamePopupState GetEndGamePopupState(EndGameResult endGameResult)
-		{
-			switch (endGameResult)
-			{
-				case EndGameResult.Win:
-					return EndGamePopupState.Win;
-				
-				case EndGameResult.LoseNoMoves:
-					return EndGamePopupState.LoseNoMoves;
-				
-				case EndGameResult.LoseNoTiles:
-					return EndGamePopupState.LoseNoTiles;
-				
-				default:
-					return EndGamePopupState.Win;
-			}
-		}
-		
-		private void HandleEndGamePopupButtonClicked()
-		{
-			_endGamePopup.Hide(() =>
-			{
-				_endGamePopup.gameObject.SetActive(false);
-				RestartGame();
-			});
+			if (_endGameController.IsEndGame)
+				_endGameController.ShowEndGamePopup();
 		}
 
 		private void RestartGame()
 		{
 			DOTween.KillAll();
 			
-			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
 			_interactionMode = InteractionMode.Common;
 			_boosterSwapController.Reset();
+			_endGameController.Reset();
 			
 			_viewController.UnselectAllBoosters();
 
@@ -477,7 +417,6 @@ namespace Game.Controller
 			List<TileFallData> fallTiles = _gameField.GetAllTilesFallData();
 			_gameFieldView.FallTiles(fallTiles);
 			
-			_isEndGame = false;
 			_isShuffling = false;
 		}
 	}
