@@ -13,6 +13,7 @@ namespace Game.Model
 		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
 		private readonly TileModelPool _pool = new();
+		private readonly GroupFinder _groupFinder = new();
 
 		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
@@ -29,43 +30,22 @@ namespace Game.Model
 			
 			InitSourceColors();
 			InitStartTiles();
+			_groupFinder.Init(_tiles, RowsCount, ColumnsCount, RadiusSuperTileBombSmall);
 		}
 
 		public List<Vector2Int> GetCommonTileGroup(int row, int column)
 		{
-			var result = new List<Vector2Int>();
-			var visited = new bool[RowsCount, ColumnsCount];
-			
-			TileModel startTile = _tiles[row, column];
-			AddNeighborTiles(row, column, startTile.Color, visited, result);
-
-			return result;
+			return _groupFinder.GetCommonTileGroup(row, column);
 		}
 		
 		public List<Vector2Int> GetSuperTileGroup(int row, int column)
 		{
-			ISuperTileLogic logic = _tiles[row, column].SuperLogic;
-			if (logic is SuperTileLogicExplodeSmall explodeSmall)
-				explodeSmall.Init(RadiusSuperTileBombSmall);
-			
-			List<Vector2Int> result = logic.GetAffectedTiles(_tiles, new Vector2Int(row, column));
-			return result;
+			return _groupFinder.GetSuperTileGroup(row, column);
 		}
 		
 		public List<Vector2Int> GetBoosterBombTileGroup(int row, int column, int radius)
 		{
-			var result = new List<Vector2Int>();
-
-			for (int r = row - radius; r <= row + radius; r++)
-			for (int c = column - radius; c <= column + radius; c++)
-			{
-				if (!IsTileInsideField(r, c))
-					continue;
-
-				result.Add(new Vector2Int(r, c));
-			}
-
-			return result;
+			return _groupFinder.GetBoosterBombTileGroup(row, column, radius);
 		}
 
 		public void RemoveTileGroup(List<Vector2Int> group)
@@ -142,31 +122,7 @@ namespace Game.Model
 		
 		public bool HasAnyAvailableGroup()
 		{
-			for (var row = 0; row < RowsCount; row++)
-			{
-				for (var col = 0; col < ColumnsCount; col++)
-				{
-					TileModel tile = _tiles[row, col];
-					if (tile == null)
-						continue;
-					
-					if (col + 1 < ColumnsCount)
-					{
-						TileModel right = _tiles[row, col + 1];
-						if (right != null && right.Color == tile.Color)
-							return true;
-					}
-					
-					if (row + 1 < RowsCount)
-					{
-						TileModel up = _tiles[row + 1, col];
-						if (up != null && up.Color == tile.Color)
-							return true;
-					}
-				}
-			}
-
-			return false;
+			return _groupFinder.HasAnyAvailableGroup();
 		}
 
 		public void SetColors(TileColor[,] colors)
@@ -212,6 +168,7 @@ namespace Game.Model
 			}
 			
 			InitStartTiles();
+			_groupFinder.Init(_tiles, RowsCount, ColumnsCount, RadiusSuperTileBombSmall);
 		}
 
 		public List<TileFallData> GetAllTilesFallData()
@@ -236,14 +193,6 @@ namespace Game.Model
 			}
 			
 			return result;
-		}
-
-		private bool IsTileInsideField(int row, int column)
-		{
-			return row >= 0 &&
-			       row < RowsCount &&
-			       column >= 0 &&
-			       column < ColumnsCount;
 		}
 
 		private void InitSourceColors()
@@ -274,31 +223,6 @@ namespace Game.Model
 		{
 			int randomColorIndex = Random.Range(0, _sourceColors.Length);
 			return _sourceColors[randomColorIndex];
-		}
-
-		private void AddNeighborTiles(int row, int column, TileColor targetColor, bool[,] visited, List<Vector2Int> result)
-		{
-			if (row < 0 || row >= RowsCount || column < 0 || column >= ColumnsCount)
-				return;
-
-			if (visited[row, column])
-				return;
-
-			TileModel tile = _tiles[row, column];
-			
-			if (tile == null)
-				return;
-			
-			if (tile.Color != targetColor)
-				return;
-
-			visited[row, column] = true;
-			result.Add(new Vector2Int(row, column));
-			
-			AddNeighborTiles(row, column - 1, targetColor, visited, result);
-			AddNeighborTiles(row, column + 1, targetColor, visited, result);
-			AddNeighborTiles(row - 1, column, targetColor, visited, result);
-			AddNeighborTiles(row + 1, column, targetColor, visited, result);
 		}
 	}
 }
