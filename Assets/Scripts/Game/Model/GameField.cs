@@ -28,6 +28,12 @@ namespace Game.Model
 		{
 			_tiles[row, column] = tile;
 		}
+		
+		public bool IsSuperTile(int row, int column)
+		{
+			TileModel tile = GetTile(row, column);
+			return tile != null && tile.SuperLogic != null;
+		}
 
 		public void Init(GameConfigData configData)
 		{

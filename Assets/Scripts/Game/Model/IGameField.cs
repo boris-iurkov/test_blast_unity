@@ -14,6 +14,7 @@ namespace Game.Model
 		
 		TileModel GetTile(int row, int column);
 		void SetTile(int row, int column, TileModel tile);
+		bool IsSuperTile(int row, int column);
 		
 		void Init(GameConfigData configData);
 		List<Vector2Int> GetCommonTileGroup(int row, int column);

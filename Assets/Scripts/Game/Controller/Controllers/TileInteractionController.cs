@@ -83,8 +83,7 @@ namespace Game.Controller.Controllers
 
 		private bool IsSuperTile(int row, int column)
 		{
-			TileModel tile = _gameField.GetTile(row, column);
-			return tile != null && tile.SuperLogic != null;
+			return _gameField.IsSuperTile(row, column);
 		}
 
 		private List<Vector2Int> GetTileGroup(int row, int column, bool isSuperTile)
@@ -180,8 +179,7 @@ namespace Game.Controller.Controllers
 			var superTilesToActivate = new List<Vector2Int>();
 			foreach (Vector2Int pos in group)
 			{
-				TileModel tile = _gameField.GetTile(pos.x, pos.y);
-				if (tile != null && tile.SuperLogic != null)
+				if (_gameField.IsSuperTile(pos.x, pos.y))
 					superTilesToActivate.Add(pos);
 			}
 			
