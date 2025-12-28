@@ -3,7 +3,7 @@ using Game.Model.SuperTile;
 
 namespace Game.Model
 {
-	public class TileModel
+	public class TileModel : ITileData
 	{
 		public TileColor Color { get; private set; }
 		public int Row { get; private set; }

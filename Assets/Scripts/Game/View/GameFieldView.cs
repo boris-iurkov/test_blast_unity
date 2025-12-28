@@ -61,7 +61,7 @@ namespace Game.View
 			_spawnOffsetsPerColumn = new int[_columnsCount];
 		}
 		
-		public void FillTile(TileModel tile)
+		public void FillTile(ITileData tile)
 		{
 			TileView tileView = CreateTile(tile.Row, tile.Column, tile.Color);
 			tileView.RectTransform.anchoredPosition = CalculateTilePosition(tile.Row, tile.Column);
@@ -245,7 +245,7 @@ namespace Game.View
 			});
 		}
 
-		public void UpdateTileLayers(TileModel tile1, TileModel tile2)
+		public void UpdateTileLayers(ITileData tile1, ITileData tile2)
 		{
 			int index1 = _tiles[tile1.Row, tile1.Column].transform.GetSiblingIndex();
 			int index2 = _tiles[tile2.Row, tile2.Column].transform.GetSiblingIndex();
@@ -278,21 +278,21 @@ namespace Game.View
 			return _fallingTiles.Count > 0;
 		}
 
-		public void SelectTile(TileModel tile)
+		public void SelectTile(ITileData tile)
 		{
 			TileView tileView = _tiles[tile.Row, tile.Column];
 			tileView.RectTransform.DOKill();
 			tileView.RectTransform.DOScale(new Vector3(0.75f, 0.75f, 1f), 0.3f);
 		}
 
-		public void UnselectTile(TileModel tile)
+		public void UnselectTile(ITileData tile)
 		{
 			TileView tileView = _tiles[tile.Row, tile.Column];
 			tileView.RectTransform.DOKill();
 			tileView.RectTransform.DOScale(Vector3.one, 0.3f);
 		}
 		
-		public void SwapTiles(TileModel tile1, TileModel tile2)
+		public void SwapTiles(ITileData tile1, ITileData tile2)
 		{
 			int row1 = tile1.Row;
 			int column1 = tile1.Column;
