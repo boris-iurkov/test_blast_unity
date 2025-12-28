@@ -30,11 +30,8 @@ namespace Game.Controller
 		
 		private BoosterSwapController _boosterSwapController;
 		private ViewController _viewController;
+		private ShuffleController _shuffleController;
 		private EndGameController _endGameController;
-		
-		private int _maxShuffles;
-		private int _countShufflesMade;
-		private bool _isShuffling;
 
 		private InteractionMode _interactionMode = InteractionMode.Common;
 		private SuperTileFactory _superTileFactory;
@@ -68,7 +65,6 @@ namespace Game.Controller
 			
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 			_gameFieldView.FallCompleted += HandleFallCompleted;
-			_gameFieldView.ShuffleCompleted += HandleShuffleCompleted;
 			_gameFieldView.SwapTilesCompleted += HandleSwapTilesCompleted;
 
 			_boosterSwapView = boosterSwapView;
@@ -93,6 +89,9 @@ namespace Game.Controller
 			_endGameController.Init(_scoreCounter, _movesCounter, _endGamePopup, gameConfigData.MaxShuffles);
 			_endGameController.OnRestartRequested += RestartGame;
 
+			_shuffleController = new ShuffleController();
+			_shuffleController.Init(_gameField, _gameFieldView, _endGameController, gameConfigData.MaxShuffles);
+
 			_boosterSwap = new BoosterCounter();
 			_boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
 			_boosterSwap.OnBoosterUsed += HandleBoosterSwapUsed;
@@ -100,8 +99,6 @@ namespace Game.Controller
 			_boosterBomb = new BoosterBombCounter();
 			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
 			_boosterBomb.OnBoosterUsed += HandleBoosterBombUsed;
-
-			_maxShuffles = gameConfigData.MaxShuffles;
 
 			_superTileFactory = new SuperTileFactory();
 
@@ -117,7 +114,7 @@ namespace Game.Controller
 		private void HandleTileClick(int row, int column)
 		{
 			if (_endGameController.IsEndGame
-			    || _isShuffling
+			    || _shuffleController.IsShuffling
 			    || _boosterSwapController.IsSwapping
 			    || _gameFieldView.IsTileFalling(row, column))
 				return;
@@ -336,71 +333,17 @@ namespace Game.Controller
 				return;
 			
 			_endGameController.TryEndGame();
-			TryEndGameByShuffle();
-		}
-
-		private ShuffleResult TryShuffle()
-		{
-			ShuffleResult shuffleResult = GetShuffleResult();
-			if (shuffleResult == ShuffleResult.NeedShuffle)
-			{
-				_isShuffling = true;
-				_countShufflesMade++;
-				DOVirtual.DelayedCall(1f, () =>
-				{
-					_gameFieldView.ShuffleTiles();
-				});
-			}
-
-			return shuffleResult;
-		}
-
-		private ShuffleResult GetShuffleResult()
-		{
-			if (_endGameController.IsEndGame)
-				return ShuffleResult.EndGame;
-
-			if (_gameField.HasAnyAvailableGroup())
-				return ShuffleResult.HasGroup;
-
-			if (_countShufflesMade < _maxShuffles)
-				return ShuffleResult.NeedShuffle;
-
-			return ShuffleResult.MaxShuffles;
-		}
-
-		private void HandleShuffleCompleted()
-		{
-			TileColor[,] colors = _gameFieldView.GetCurrentTileColors();
-			_gameField.SetColors(colors);
-
-			_isShuffling = false;
-			_endGameController.Reset();
-
-			TryEndGameByShuffle();
-		}
-		
-		private void TryEndGameByShuffle()
-		{
-			ShuffleResult shuffleResult = TryShuffle();
-			if (shuffleResult == ShuffleResult.MaxShuffles)
-			{
-				_endGameController.SetShufflesCount(_countShufflesMade);
-				_endGameController.TryEndGame();
-			}
-			
-			if (_endGameController.IsEndGame)
-				_endGameController.ShowEndGamePopup();
+			_shuffleController.TryEndGameByShuffle();
 		}
 
 		private void RestartGame()
 		{
 			DOTween.KillAll();
 			
-			_countShufflesMade = 0;
 			_interactionMode = InteractionMode.Common;
 			_boosterSwapController.Reset();
 			_endGameController.Reset();
+			_shuffleController.Reset();
 			
 			_viewController.UnselectAllBoosters();
 
@@ -416,8 +359,6 @@ namespace Game.Controller
 			
 			List<TileFallData> fallTiles = _gameField.GetAllTilesFallData();
 			_gameFieldView.FallTiles(fallTiles);
-			
-			_isShuffling = false;
 		}
 	}
 }
