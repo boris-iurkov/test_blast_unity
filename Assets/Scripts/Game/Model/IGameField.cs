@@ -7,11 +7,13 @@ namespace Game.Model
 {
 	public interface IGameField
 	{
-		TileModel[,] Tiles { get; }
 		int RowsCount { get; }
 		int ColumnsCount { get; }
 		int MinSuperTileGroupSize { get; }
 		int RadiusSuperTileBombSmall { get; }
+		
+		TileModel GetTile(int row, int column);
+		void SetTile(int row, int column, TileModel tile);
 		
 		void Init(GameConfigData configData);
 		List<Vector2Int> GetCommonTileGroup(int row, int column);

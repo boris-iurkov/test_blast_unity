@@ -14,11 +14,20 @@ namespace Game.Model
 		private readonly TileSpawner _tileSpawner = new();
 		private readonly TileFieldManager _tileFieldManager = new();
 
-		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
 		public int ColumnsCount { get; private set; }
 		public int MinSuperTileGroupSize { get; private set; }
 		public int RadiusSuperTileBombSmall { get; private set; }
+		
+		public TileModel GetTile(int row, int column)
+		{
+			return _tiles[row, column];
+		}
+		
+		public void SetTile(int row, int column, TileModel tile)
+		{
+			_tiles[row, column] = tile;
+		}
 
 		public void Init(GameConfigData configData)
 		{

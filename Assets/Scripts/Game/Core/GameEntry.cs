@@ -81,7 +81,7 @@ namespace Game.Core
 			
 			for (var row = 0; row < gameField.RowsCount; row++)
 			for (var column = 0; column < gameField.ColumnsCount; column++)
-				gameFieldView.FillTile(gameField.Tiles[row, column]);
+				gameFieldView.FillTile(gameField.GetTile(row, column));
 			
 			var endGameController = new EndGameController();
 			endGameController.Init(scoreCounter, movesCounter, endGamePopup, gameConfigData.MaxShuffles);

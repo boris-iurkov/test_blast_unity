@@ -40,7 +40,7 @@ namespace Game.Controller.Controllers
 			if (!CanProcessTileClick(row, column, isEndGame, isShuffling))
 				return;
 
-			TileModel clickedTile = _gameField.Tiles[row, column];
+			TileModel clickedTile = _gameField.GetTile(row, column);
 			if (clickedTile == null)
 				return;
 
@@ -75,7 +75,7 @@ namespace Game.Controller.Controllers
 			if (_boosterController.InteractionMode != InteractionMode.BoosterSwap)
 				return false;
 
-			TileModel tile = _gameField.Tiles[row, column];
+			TileModel tile = _gameField.GetTile(row, column);
 			if (tile != null)
 				_boosterController.BoosterSwapController.OnTileClicked(tile);
 			return true;
@@ -83,7 +83,7 @@ namespace Game.Controller.Controllers
 
 		private bool IsSuperTile(int row, int column)
 		{
-			TileModel tile = _gameField.Tiles[row, column];
+			TileModel tile = _gameField.GetTile(row, column);
 			return tile != null && tile.SuperLogic != null;
 		}
 
@@ -134,7 +134,7 @@ namespace Game.Controller.Controllers
 			ISuperTileLogic superTileLogic = _superTileFactory.CreateRandomSuperTile();
 			_gameField.SetSuperTileLogic(row, column, superTileLogic);
 			
-			TileModel tile = _gameField.Tiles[row, column];
+			TileModel tile = _gameField.GetTile(row, column);
 			if (tile != null)
 				_gameFieldView.UpdateTileView(row, column, tile.Color);
 		}
@@ -180,7 +180,7 @@ namespace Game.Controller.Controllers
 			var superTilesToActivate = new List<Vector2Int>();
 			foreach (Vector2Int pos in group)
 			{
-				TileModel tile = _gameField.Tiles[pos.x, pos.y];
+				TileModel tile = _gameField.GetTile(pos.x, pos.y);
 				if (tile != null && tile.SuperLogic != null)
 					superTilesToActivate.Add(pos);
 			}
