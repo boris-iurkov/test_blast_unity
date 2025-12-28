@@ -13,7 +13,7 @@ namespace Game.Controller.Controllers
 		
 		private IScoreCounter _scoreCounter;
 		private IMovesCounter _movesCounter;
-		private EndGamePopup _endGamePopup;
+		private IEndGamePopup _endGamePopup;
 		
 		private bool _isEndGame;
 		private bool _isPopupShown;
@@ -21,14 +21,14 @@ namespace Game.Controller.Controllers
 		private int _maxShuffles;
 		private int _countShufflesMade;
 
-		public void Init(IScoreCounter scoreCounter, IMovesCounter movesCounter, EndGamePopup endGamePopup, int maxShuffles)
+		public void Init(IScoreCounter scoreCounter, IMovesCounter movesCounter, IEndGamePopup endGamePopup, int maxShuffles)
 		{
 			_scoreCounter = scoreCounter;
 			_movesCounter = movesCounter;
 			_endGamePopup = endGamePopup;
 			_maxShuffles = maxShuffles;
 			
-			_endGamePopup.gameObject.SetActive(false);
+			_endGamePopup.SetActive(false);
 			_endGamePopup.OnButtonClicked += HandleEndGamePopupButtonClicked;
 		}
 
@@ -70,7 +70,7 @@ namespace Game.Controller.Controllers
 			
 			_isPopupShown = true;
 
-			_endGamePopup.gameObject.SetActive(true);
+			_endGamePopup.SetActive(true);
 			EndGamePopupState state = GetEndGamePopupState(_endGameResult);
 			_endGamePopup.Show(state);
 		}
@@ -105,7 +105,7 @@ namespace Game.Controller.Controllers
 		{
 			_endGamePopup.Hide(() =>
 			{
-				_endGamePopup.gameObject.SetActive(false);
+				_endGamePopup.SetActive(false);
 				OnRestartRequested?.Invoke();
 			});
 		}

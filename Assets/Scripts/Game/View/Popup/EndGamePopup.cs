@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Game.View.Popup
 {
-	public class EndGamePopup : MonoBehaviour
+	public class EndGamePopup : MonoBehaviour, IEndGamePopup
 	{
 		[SerializeField] private EndGamePopupConfig endGamePopupConfig;
 		
@@ -22,6 +22,11 @@ namespace Game.View.Popup
 		[SerializeField] private TextMeshProUGUI buttonText;
 
 		public event Action OnButtonClicked;
+
+		public void SetActive(bool active)
+		{
+			gameObject.SetActive(active);
+		}
 
 		public void Show(EndGamePopupState state)
 		{
