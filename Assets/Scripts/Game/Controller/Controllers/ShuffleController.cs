@@ -10,13 +10,13 @@ namespace Game.Controller.Controllers
 	{
 		public bool IsShuffling { get; private set; }
 		
-		private GameField _gameField;
-		private GameFieldView _gameFieldView;
+		private IGameField _gameField;
+		private IGameFieldView _gameFieldView;
 		private EndGameController _endGameController;
 		private int _maxShuffles;
 		private int _countShufflesMade;
 
-		public void Init(GameField gameField, GameFieldView gameFieldView, EndGameController endGameController, int maxShuffles)
+		public void Init(IGameField gameField, IGameFieldView gameFieldView, EndGameController endGameController, int maxShuffles)
 		{
 			_gameField = gameField;
 			_gameFieldView = gameFieldView;

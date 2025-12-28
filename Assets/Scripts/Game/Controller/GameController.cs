@@ -14,13 +14,13 @@ namespace Game.Controller
 {
 	public class GameController
 	{
-		private GameField _gameField;
-		private MovesCounter _movesCounter;
-		private ScoreCounter _scoreCounter;
-		private BoosterCounter _boosterSwap;
-		private BoosterBombCounter _boosterBomb;
+		private IGameField _gameField;
+		private IMovesCounter _movesCounter;
+		private IScoreCounter _scoreCounter;
+		private IBoosterCounter _boosterSwap;
+		private IBoosterBombCounter _boosterBomb;
 
-		private GameFieldView _gameFieldView;
+		private IGameFieldView _gameFieldView;
 		private EndGamePopup _endGamePopup;
 		
 		private TileInteractionController _tileInteractionController;

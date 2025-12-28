@@ -2,7 +2,7 @@ using System;
 
 namespace Game.Model
 {
-	public class ScoreCounter
+	public class ScoreCounter : IScoreCounter
 	{
 		public int TargetScore { get; private set; }
 		public int Score { get; private set; }

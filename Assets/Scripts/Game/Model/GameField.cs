@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.Model
 {
-	public class GameField
+	public class GameField : IGameField
 	{
 		private TileModel[,] _tiles;
 		private readonly TileModelPool _pool = new();

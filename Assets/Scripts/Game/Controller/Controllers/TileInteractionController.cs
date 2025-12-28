@@ -12,18 +12,18 @@ namespace Game.Controller.Controllers
 {
 	public class TileInteractionController
 	{
-		private GameField _gameField;
-		private GameFieldView _gameFieldView;
-		private ScoreCounter _scoreCounter;
-		private MovesCounter _movesCounter;
+		private IGameField _gameField;
+		private IGameFieldView _gameFieldView;
+		private IScoreCounter _scoreCounter;
+		private IMovesCounter _movesCounter;
 		private BoosterController _boosterController;
 		private SuperTileFactory _superTileFactory;
 
 		public void Init(
-			GameField gameField,
-			GameFieldView gameFieldView,
-			ScoreCounter scoreCounter,
-			MovesCounter movesCounter,
+			IGameField gameField,
+			IGameFieldView gameFieldView,
+			IScoreCounter scoreCounter,
+			IMovesCounter movesCounter,
 			BoosterController boosterController,
 			SuperTileFactory superTileFactory)
 		{

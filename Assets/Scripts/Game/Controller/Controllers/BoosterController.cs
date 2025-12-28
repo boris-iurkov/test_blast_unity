@@ -10,22 +10,22 @@ namespace Game.Controller.Controllers
 	{
 		public InteractionMode InteractionMode { get; private set; } = InteractionMode.Common;
 		public BoosterSwapController BoosterSwapController { get; private set; }
-		public BoosterBombCounter BoosterBomb { get; private set; }
+		public IBoosterBombCounter BoosterBomb { get; private set; }
 
-		private BoosterCounter _boosterSwap;
+		private IBoosterCounter _boosterSwap;
 		private BoosterPanelView _boosterSwapView;
 		private BoosterPanelView _boosterBombView;
-		private GameFieldView _gameFieldView;
-		private GameField _gameField;
+		private IGameFieldView _gameFieldView;
+		private IGameField _gameField;
 		private ViewController _viewController;
 
 		public void Init(
-			BoosterCounter boosterSwap,
-			BoosterBombCounter boosterBomb,
+			IBoosterCounter boosterSwap,
+			IBoosterBombCounter boosterBomb,
 			BoosterPanelView boosterSwapView,
 			BoosterPanelView boosterBombView,
-			GameFieldView gameFieldView,
-			GameField gameField,
+			IGameFieldView gameFieldView,
+			IGameField gameField,
 			ViewController viewController)
 		{
 			_boosterSwap = boosterSwap;

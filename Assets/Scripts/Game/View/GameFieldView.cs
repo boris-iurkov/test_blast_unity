@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace Game.View
 {
-	public class GameFieldView : MonoBehaviour
+	public class GameFieldView : MonoBehaviour, IGameFieldView
 	{
 		[SerializeField] private RectTransform tilesParent;
 		

@@ -11,8 +11,8 @@ namespace Game.Controller.Controllers
 		public bool IsEndGame => _isEndGame;
 		public event Action OnRestartRequested;
 		
-		private ScoreCounter _scoreCounter;
-		private MovesCounter _movesCounter;
+		private IScoreCounter _scoreCounter;
+		private IMovesCounter _movesCounter;
 		private EndGamePopup _endGamePopup;
 		
 		private bool _isEndGame;
@@ -21,7 +21,7 @@ namespace Game.Controller.Controllers
 		private int _maxShuffles;
 		private int _countShufflesMade;
 
-		public void Init(ScoreCounter scoreCounter, MovesCounter movesCounter, EndGamePopup endGamePopup, int maxShuffles)
+		public void Init(IScoreCounter scoreCounter, IMovesCounter movesCounter, EndGamePopup endGamePopup, int maxShuffles)
 		{
 			_scoreCounter = scoreCounter;
 			_movesCounter = movesCounter;

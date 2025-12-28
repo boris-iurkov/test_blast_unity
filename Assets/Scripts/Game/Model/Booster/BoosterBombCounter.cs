@@ -1,6 +1,6 @@
 namespace Game.Model.Booster
 {
-	public class BoosterBombCounter : BoosterCounter
+	public class BoosterBombCounter : BoosterCounter, IBoosterBombCounter
 	{
 		public int Radius { get; private set; }
 

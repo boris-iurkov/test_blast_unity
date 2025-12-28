@@ -2,7 +2,7 @@ using System;
 
 namespace Game.Model
 {
-	public class MovesCounter
+	public class MovesCounter : IMovesCounter
 	{
 		public int MaxMoves { get; private set; }
 		public int MovesLeft { get; private set; }

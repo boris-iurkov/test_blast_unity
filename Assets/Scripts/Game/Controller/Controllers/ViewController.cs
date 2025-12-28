@@ -11,20 +11,20 @@ namespace Game.Controller.Controllers
 		private BoosterPanelView _boosterSwapView;
 		private BoosterPanelView _boosterBombView;
 		
-		private MovesCounter _movesCounter;
-		private ScoreCounter _scoreCounter;
-		private BoosterCounter _boosterSwap;
-		private BoosterBombCounter _boosterBomb;
+		private IMovesCounter _movesCounter;
+		private IScoreCounter _scoreCounter;
+		private IBoosterCounter _boosterSwap;
+		private IBoosterBombCounter _boosterBomb;
 
 		public void Init(
 			MovesView movesView,
 			ScoreView scoreView,
 			BoosterPanelView boosterSwapView,
 			BoosterPanelView boosterBombView,
-			MovesCounter movesCounter,
-			ScoreCounter scoreCounter,
-			BoosterCounter boosterSwap,
-			BoosterBombCounter boosterBomb)
+			IMovesCounter movesCounter,
+			IScoreCounter scoreCounter,
+			IBoosterCounter boosterSwap,
+			IBoosterBombCounter boosterBomb)
 		{
 			_movesView = movesView;
 			_scoreView = scoreView;

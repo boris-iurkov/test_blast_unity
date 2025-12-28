@@ -2,7 +2,7 @@ using System;
 
 namespace Game.Model.Booster
 {
-	public class BoosterCounter
+	public class BoosterCounter : IBoosterCounter
 	{
 		public int StartCount { get; private set; }
 		public int Count { get; private set; }
