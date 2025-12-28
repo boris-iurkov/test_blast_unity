@@ -16,6 +16,7 @@ namespace Game.Controller.Controllers
 		private EndGamePopup _endGamePopup;
 		
 		private bool _isEndGame;
+		private bool _isPopupShown;
 		private EndGameResult _endGameResult = EndGameResult.None;
 		private int _maxShuffles;
 		private int _countShufflesMade;
@@ -64,9 +65,11 @@ namespace Game.Controller.Controllers
 
 		public void ShowEndGamePopup()
 		{
-			if (!_isEndGame)
+			if (!_isEndGame || _isPopupShown)
 				return;
-				
+			
+			_isPopupShown = true;
+
 			_endGamePopup.gameObject.SetActive(true);
 			EndGamePopupState state = GetEndGamePopupState(_endGameResult);
 			_endGamePopup.Show(state);
@@ -75,6 +78,7 @@ namespace Game.Controller.Controllers
 		public void Reset()
 		{
 			_isEndGame = false;
+			_isPopupShown = false;
 			_endGameResult = EndGameResult.None;
 			_countShufflesMade = 0;
 		}

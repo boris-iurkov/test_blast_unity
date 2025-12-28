@@ -34,9 +34,6 @@ namespace Game.Controller.Controllers
 				_endGameController.SetShufflesCount(_countShufflesMade);
 				_endGameController.TryEndGame();
 			}
-			
-			if (_endGameController.IsEndGame)
-				_endGameController.ShowEndGamePopup();
 		}
 
 		public void Reset()

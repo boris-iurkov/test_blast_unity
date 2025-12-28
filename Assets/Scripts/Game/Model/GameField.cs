@@ -72,8 +72,12 @@ namespace Game.Model
 		{
 			foreach (Vector2Int positions in group)
 			{
-				_pool.ReturnTile(_tiles[positions.x, positions.y]);
-				_tiles[positions.x, positions.y] = null;
+				TileModel tile = _tiles[positions.x, positions.y];
+				if (tile != null)
+				{
+					_pool.ReturnTile(tile);
+					_tiles[positions.x, positions.y] = null;
+				}
 			}
 		}
 

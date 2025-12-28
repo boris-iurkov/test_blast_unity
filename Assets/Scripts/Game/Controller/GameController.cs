@@ -119,6 +119,9 @@ namespace Game.Controller
 			
 			_endGameController.TryEndGame();
 			_shuffleController.TryEndGameByShuffle();
+			
+			if (_endGameController.IsEndGame)
+				_endGameController.ShowEndGamePopup();
 		}
 
 		private void RestartGame()

@@ -40,6 +40,10 @@ namespace Game.Controller.Controllers
 			if (!CanProcessTileClick(row, column, isEndGame, isShuffling))
 				return;
 
+			TileModel clickedTile = _gameField.Tiles[row, column];
+			if (clickedTile == null)
+				return;
+
 			if (TryHandleBoosterSwap(row, column))
 				return;
 
@@ -47,11 +51,11 @@ namespace Game.Controller.Controllers
 			List<Vector2Int> group = GetTileGroup(row, column, isSuperTile);
 			group = FilterFallingTiles(group);
 			
-			if (!TryProcessCommonMode(row, column, group, isSuperTile, out int groupCount))
+			if (!TryProcessCommonMode(row, column, group, isSuperTile, out int groupCount, out bool superTileCreated))
 				return;
 			
 			List<Vector2Int> finalGroup = ActivateSuperTilesInGroup(group);
-			ProcessGroupRemoval(finalGroup, row, column);
+			ProcessGroupRemoval(finalGroup, row, column, superTileCreated);
 			AddScoreAndMakeMove(groupCount, isSuperTile);
 			
 			UseBoosterIfNeeded();
@@ -79,7 +83,8 @@ namespace Game.Controller.Controllers
 
 		private bool IsSuperTile(int row, int column)
 		{
-			return _gameField.Tiles[row, column].SuperLogic != null;
+			TileModel tile = _gameField.Tiles[row, column];
+			return tile != null && tile.SuperLogic != null;
 		}
 
 		private List<Vector2Int> GetTileGroup(int row, int column, bool isSuperTile)
@@ -103,9 +108,10 @@ namespace Game.Controller.Controllers
 			return filteredGroup;
 		}
 
-		private bool TryProcessCommonMode(int row, int column, List<Vector2Int> group, bool isSuperTile, out int groupCount)
+		private bool TryProcessCommonMode(int row, int column, List<Vector2Int> group, bool isSuperTile, out int groupCount, out bool superTileCreated)
 		{
 			groupCount = group.Count;
+			superTileCreated = false;
 
 			if (_boosterController.InteractionMode != InteractionMode.Common)
 				return true;
@@ -114,7 +120,10 @@ namespace Game.Controller.Controllers
 				return false;
 
 			if (groupCount >= _gameField.MinSuperTileGroupSize && !isSuperTile)
+			{
 				CreateSuperTile(row, column, group);
+				superTileCreated = true;
+			}
 
 			return true;
 		}
@@ -124,11 +133,17 @@ namespace Game.Controller.Controllers
 			group.RemoveAll(tile => tile.x == row && tile.y == column);
 			ISuperTileLogic superTileLogic = _superTileFactory.CreateRandomSuperTile();
 			_gameField.SetSuperTileLogic(row, column, superTileLogic);
-			_gameFieldView.UpdateTileView(row, column, _gameField.Tiles[row, column].Color);
+			
+			TileModel tile = _gameField.Tiles[row, column];
+			if (tile != null)
+				_gameFieldView.UpdateTileView(row, column, tile.Color);
 		}
 
-		private void ProcessGroupRemoval(List<Vector2Int> finalGroup, int row, int column)
+		private void ProcessGroupRemoval(List<Vector2Int> finalGroup, int row, int column, bool excludeSuperTilePosition)
 		{
+			if (excludeSuperTilePosition)
+				finalGroup.Remove(new Vector2Int(row, column));
+
 			_gameField.RemoveTileGroup(finalGroup);
 			_gameFieldView.RemoveTileGroup(finalGroup, row, column);
 
