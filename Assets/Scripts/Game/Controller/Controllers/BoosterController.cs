@@ -6,10 +6,10 @@ using Game.View;
 
 namespace Game.Controller.Controllers
 {
-	public class BoosterController
+	public class BoosterController : IBoosterController
 	{
 		public InteractionMode InteractionMode { get; private set; } = InteractionMode.Common;
-		public BoosterSwapController BoosterSwapController { get; private set; }
+		public IBoosterSwapController BoosterSwapController { get; private set; }
 		public IBoosterBombCounter BoosterBomb { get; private set; }
 
 		private IBoosterCounter _boosterSwap;
@@ -17,7 +17,7 @@ namespace Game.Controller.Controllers
 		private BoosterPanelView _boosterBombView;
 		private IGameFieldView _gameFieldView;
 		private IGameField _gameField;
-		private ViewController _viewController;
+		private IViewController _viewController;
 
 		public void Init(
 			IBoosterCounter boosterSwap,
@@ -26,7 +26,8 @@ namespace Game.Controller.Controllers
 			BoosterPanelView boosterBombView,
 			IGameFieldView gameFieldView,
 			IGameField gameField,
-			ViewController viewController)
+			IViewController viewController,
+			IBoosterSwapController boosterSwapController)
 		{
 			_boosterSwap = boosterSwap;
 			BoosterBomb = boosterBomb;
@@ -45,7 +46,7 @@ namespace Game.Controller.Controllers
 			_boosterSwap.OnBoosterUsed += HandleBoosterSwapUsed;
 			BoosterBomb.OnBoosterUsed += HandleBoosterBombUsed;
 
-			BoosterSwapController = new BoosterSwapController();
+			BoosterSwapController = boosterSwapController;
 			BoosterSwapController.OnTileSelected += HandleTileSelected;
 			BoosterSwapController.OnTileUnselected += HandleTileUnselected;
 		}

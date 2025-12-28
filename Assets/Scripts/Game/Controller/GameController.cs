@@ -17,11 +17,11 @@ namespace Game.Controller
 		private IBoosterBombCounter _boosterBomb;
 		private IGameFieldView _gameFieldView;
 		
-		private TileInteractionController _tileInteractionController;
-		private BoosterController _boosterController;
-		private ViewController _viewController;
-		private ShuffleController _shuffleController;
-		private EndGameController _endGameController;
+		private ITileInteractionController _tileInteractionController;
+		private IBoosterController _boosterController;
+		private IViewController _viewController;
+		private IShuffleController _shuffleController;
+		private IEndGameController _endGameController;
 
 		public void Init(
 			IGameField gameField,
@@ -30,11 +30,11 @@ namespace Game.Controller
 			IScoreCounter scoreCounter,
 			IBoosterCounter boosterSwap,
 			IBoosterBombCounter boosterBomb,
-			EndGameController endGameController,
-			ShuffleController shuffleController,
-			ViewController viewController,
-			BoosterController boosterController,
-			TileInteractionController tileInteractionController)
+			IEndGameController endGameController,
+			IShuffleController shuffleController,
+			IViewController viewController,
+			IBoosterController boosterController,
+			ITileInteractionController tileInteractionController)
 		{
 			_gameField = gameField;
 			_gameFieldView = gameFieldView;

@@ -3,7 +3,7 @@ using Game.Model;
 
 namespace Game.Controller.Controllers
 {
-	public class BoosterSwapController
+	public class BoosterSwapController : IBoosterSwapController
 	{
 		public TileModel FirstSelected { get; private set; }
 		public TileModel SecondSelected { get; private set; }

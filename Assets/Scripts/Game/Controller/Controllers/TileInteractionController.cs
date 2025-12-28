@@ -10,13 +10,13 @@ using UnityEngine;
 
 namespace Game.Controller.Controllers
 {
-	public class TileInteractionController
+	public class TileInteractionController : ITileInteractionController
 	{
 		private IGameField _gameField;
 		private IGameFieldView _gameFieldView;
 		private IScoreCounter _scoreCounter;
 		private IMovesCounter _movesCounter;
-		private BoosterController _boosterController;
+		private IBoosterController _boosterController;
 		private SuperTileFactory _superTileFactory;
 
 		public void Init(
@@ -24,7 +24,7 @@ namespace Game.Controller.Controllers
 			IGameFieldView gameFieldView,
 			IScoreCounter scoreCounter,
 			IMovesCounter movesCounter,
-			BoosterController boosterController,
+			IBoosterController boosterController,
 			SuperTileFactory superTileFactory)
 		{
 			_gameField = gameField;

@@ -6,7 +6,7 @@ using Game.View.Popup;
 
 namespace Game.Controller.Controllers
 {
-	public class EndGameController
+	public class EndGameController : IEndGameController
 	{
 		public bool IsEndGame => _isEndGame;
 		public event Action OnRestartRequested;

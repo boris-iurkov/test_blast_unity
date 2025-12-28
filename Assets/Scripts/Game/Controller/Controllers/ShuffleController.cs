@@ -6,17 +6,17 @@ using Game.View;
 
 namespace Game.Controller.Controllers
 {
-	public class ShuffleController
+	public class ShuffleController : IShuffleController
 	{
 		public bool IsShuffling { get; private set; }
 		
 		private IGameField _gameField;
 		private IGameFieldView _gameFieldView;
-		private EndGameController _endGameController;
+		private IEndGameController _endGameController;
 		private int _maxShuffles;
 		private int _countShufflesMade;
 
-		public void Init(IGameField gameField, IGameFieldView gameFieldView, EndGameController endGameController, int maxShuffles)
+		public void Init(IGameField gameField, IGameFieldView gameFieldView, IEndGameController endGameController, int maxShuffles)
 		{
 			_gameField = gameField;
 			_gameFieldView = gameFieldView;

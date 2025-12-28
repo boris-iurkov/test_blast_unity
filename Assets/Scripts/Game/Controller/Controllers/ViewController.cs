@@ -4,7 +4,7 @@ using Game.View;
 
 namespace Game.Controller.Controllers
 {
-	public class ViewController
+	public class ViewController : IViewController
 	{
 		private MovesView _movesView;
 		private ScoreView _scoreView;

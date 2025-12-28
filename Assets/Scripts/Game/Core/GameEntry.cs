@@ -95,8 +95,10 @@ namespace Game.Core
 			var viewController = new ViewController();
 			viewController.Init(movesView, scoreView, boosterSwapView, boosterBombView, movesCounter, scoreCounter, boosterSwap, boosterBomb);
 			
+			var boosterSwapController = new BoosterSwapController();
+			
 			var boosterController = new BoosterController();
-			boosterController.Init(boosterSwap, boosterBomb, boosterSwapView, boosterBombView, gameFieldView, gameField, viewController);
+			boosterController.Init(boosterSwap, boosterBomb, boosterSwapView, boosterBombView, gameFieldView, gameField, viewController, boosterSwapController);
 			
 			var superTileFactory = new SuperTileFactory();
 			
