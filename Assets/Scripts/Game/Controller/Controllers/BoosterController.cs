@@ -134,32 +134,35 @@ namespace Game.Controller.Controllers
 			
 			if (InteractionMode != InteractionMode.BoosterSwap)
 			{
-				TileModel firstTile = BoosterSwapController.FirstSelected;
+				ITileData firstTile = BoosterSwapController.FirstSelected;
 				if (firstTile != null)
 					_gameFieldView.UnselectTile(firstTile);
 				BoosterSwapController.Reset();
 			}
 		}
 
-		private void HandleTileSelected(TileModel tile)
+		private void HandleTileSelected(ITileData tile)
 		{
 			_gameFieldView.SelectTile(tile);
 			if (BoosterSwapController.SecondSelected != null)
 			{
-				TileModel firstTile = BoosterSwapController.FirstSelected;
-				TileModel secondTile = BoosterSwapController.SecondSelected;
+				ITileData firstTile = BoosterSwapController.FirstSelected;
+				ITileData secondTile = BoosterSwapController.SecondSelected;
 
 				_gameFieldView.UnselectTile(firstTile);
 				_gameFieldView.UnselectTile(secondTile);
 				
 				_gameFieldView.SwapTiles(firstTile, secondTile);
-				_gameField.SwapTiles(firstTile, secondTile);
+				
+				TileModel firstTileModel = _gameField.GetTile(firstTile.Row, firstTile.Column);
+				TileModel secondTileModel = _gameField.GetTile(secondTile.Row, secondTile.Column);
+				_gameField.SwapTiles(firstTileModel, secondTileModel);
 				
 				_boosterSwap.Use();
 			}
 		}
 		
-		private void HandleTileUnselected(TileModel tile)
+		private void HandleTileUnselected(ITileData tile)
 		{
 			_gameFieldView.UnselectTile(tile);
 		}

@@ -5,14 +5,14 @@ namespace Game.Controller.Controllers
 {
 	public class BoosterSwapController : IBoosterSwapController
 	{
-		public TileModel FirstSelected { get; private set; }
-		public TileModel SecondSelected { get; private set; }
+		public ITileData FirstSelected { get; private set; }
+		public ITileData SecondSelected { get; private set; }
 		public bool IsSwapping { get; private set; }
 
-		public event Action<TileModel> OnTileSelected;
-		public event Action<TileModel> OnTileUnselected;
+		public event Action<ITileData> OnTileSelected;
+		public event Action<ITileData> OnTileUnselected;
 
-		public void OnTileClicked(TileModel tile)
+		public void OnTileClicked(ITileData tile)
 		{
 			if (FirstSelected == null)
 			{

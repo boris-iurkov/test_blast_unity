@@ -5,14 +5,14 @@ namespace Game.Controller.Controllers
 {
 	public interface IBoosterSwapController
 	{
-		TileModel FirstSelected { get; }
-		TileModel SecondSelected { get; }
+		ITileData FirstSelected { get; }
+		ITileData SecondSelected { get; }
 		bool IsSwapping { get; }
 		
-		event Action<TileModel> OnTileSelected;
-		event Action<TileModel> OnTileUnselected;
+		event Action<ITileData> OnTileSelected;
+		event Action<ITileData> OnTileUnselected;
 		
-		void OnTileClicked(TileModel tile);
+		void OnTileClicked(ITileData tile);
 		void Reset();
 	}
 }
