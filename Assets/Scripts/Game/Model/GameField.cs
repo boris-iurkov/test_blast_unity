@@ -1,20 +1,17 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Game.Model.Data;
 using Game.Model.SuperTile;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Game.Model
 {
 	public class GameField
 	{
-		private TileColor[] _sourceColors;
 		private TileModel[,] _tiles;
 		private readonly TileModelPool _pool = new();
 		private readonly GroupFinder _groupFinder = new();
 		private readonly TileFallCalculator _tileFallCalculator = new();
+		private readonly TileSpawner _tileSpawner = new();
 
 		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
@@ -29,9 +26,13 @@ namespace Game.Model
 			MinSuperTileGroupSize = configData.MinSuperTileGroupSize;
 			RadiusSuperTileBombSmall = configData.RadiusSuperTileBombSmall;
 			
-			InitSourceColors();
-			InitStartTiles();
+			_tiles = new TileModel[RowsCount, ColumnsCount];
+			
+			_tileSpawner.Init(_pool, _tiles, RowsCount, ColumnsCount);
+			_tileSpawner.SpawnStartTiles();
+			
 			_groupFinder.Init(_tiles, RowsCount, ColumnsCount, RadiusSuperTileBombSmall);
+			
 			_tileFallCalculator.Init(_tiles, RowsCount, ColumnsCount);
 		}
 
@@ -75,10 +76,7 @@ namespace Game.Model
 					int targetRow = RowsCount - emptyTiles + i;
 					int spawnRow = RowsCount + i + 1;
 
-					TileModel newTile = _pool.GetTile();
-					newTile.SetColor(GetRandomTileColor());
-					newTile.SetPositions(targetRow, column);
-					_tiles[targetRow, column] = newTile;
+					TileModel newTile = _tileSpawner.SpawnTile(targetRow, column);
 
 					result.Add(new TileFallData
 					{
@@ -139,7 +137,7 @@ namespace Game.Model
 				}
 			}
 			
-			InitStartTiles();
+			_tileSpawner.SpawnStartTiles();
 			_groupFinder.Init(_tiles, RowsCount, ColumnsCount, RadiusSuperTileBombSmall);
 			_tileFallCalculator.Init(_tiles, RowsCount, ColumnsCount);
 		}
@@ -147,36 +145,6 @@ namespace Game.Model
 		public List<TileFallData> GetAllTilesFallData()
 		{
 			return _tileFallCalculator.GetAllTilesFallData();
-		}
-
-		private void InitSourceColors()
-		{
-			_sourceColors = Enum.GetValues(typeof(TileColor))
-				.Cast<TileColor>()
-				.Take(5)
-				.ToArray();
-		}
-
-		private void InitStartTiles()
-		{
-			_tiles = new TileModel[RowsCount, ColumnsCount];
-			
-			for (var row = 0; row < RowsCount; row++)
-			{
-				for (var column = 0; column < ColumnsCount; column++)
-				{
-					TileModel tile = _pool.GetTile();
-					tile.SetColor(GetRandomTileColor());
-					tile.SetPositions(row, column);
-					_tiles[row, column] = tile;
-				}
-			}
-		}
-
-		private TileColor GetRandomTileColor()
-		{
-			int randomColorIndex = Random.Range(0, _sourceColors.Length);
-			return _sourceColors[randomColorIndex];
 		}
 	}
 }
