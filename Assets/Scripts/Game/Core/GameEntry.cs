@@ -1,4 +1,8 @@
 using Game.Controller;
+using Game.Controller.Controllers;
+using Game.Controller.Factory;
+using Game.Model;
+using Game.Model.Booster;
 using Game.Model.Config;
 using Game.Model.Data;
 using Game.View;
@@ -53,18 +57,65 @@ namespace Game.Core
 				GameFieldHeight = fieldConfig.gameFieldHeight
 			};
 			
+			IGameField gameField = new GameField();
+			gameField.Init(gameConfigData);
+			
+			IMovesCounter movesCounter = new MovesCounter();
+			movesCounter.Init(gameConfigData.MaxMoves);
+			
+			IScoreCounter scoreCounter = new ScoreCounter();
+			scoreCounter.Init(gameConfigData.TargetScore);
+			
+			IBoosterCounter boosterSwap = new BoosterCounter();
+			boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
+			
+			IBoosterBombCounter boosterBomb = new BoosterBombCounter();
+			boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
+			
+			gameFieldView.Init(
+				tileViewLibrary,
+				tileViewPool,
+				fieldConfigData,
+				gameField.RowsCount,
+				gameField.ColumnsCount);
+			
+			for (var row = 0; row < gameField.RowsCount; row++)
+			for (var column = 0; column < gameField.ColumnsCount; column++)
+				gameFieldView.FillTile(gameField.Tiles[row, column]);
+			
+			var endGameController = new EndGameController();
+			endGameController.Init(scoreCounter, movesCounter, endGamePopup, gameConfigData.MaxShuffles);
+			
+			var shuffleController = new ShuffleController();
+			shuffleController.Init(gameField, gameFieldView, endGameController, gameConfigData.MaxShuffles);
+			
+			var viewController = new ViewController();
+			viewController.Init(movesView, scoreView, boosterSwapView, boosterBombView, movesCounter, scoreCounter, boosterSwap, boosterBomb);
+			
+			var boosterController = new BoosterController();
+			boosterController.Init(boosterSwap, boosterBomb, boosterSwapView, boosterBombView, gameFieldView, gameField, viewController);
+			
+			var superTileFactory = new SuperTileFactory();
+			
+			var tileInteractionController = new TileInteractionController();
+			tileInteractionController.Init(gameField, gameFieldView, scoreCounter, movesCounter, boosterController, superTileFactory);
+			
 			_gameController = new GameController();
 			_gameController.Init(
-				gameFieldView, 
-				movesView,
-				scoreView,
-				boosterSwapView,
-				boosterBombView,
-				endGamePopup,
-				tileViewLibrary, 
-				tileViewPool, 
-				gameConfigData,
-				fieldConfigData);
+				gameField,
+				gameFieldView,
+				movesCounter,
+				scoreCounter,
+				boosterSwap,
+				boosterBomb,
+				endGameController,
+				shuffleController,
+				viewController,
+				boosterController,
+				tileInteractionController);
+			
+			viewController.UpdateAllViews();
+			boosterController.UpdateViews();
 		}
 	}
 }
