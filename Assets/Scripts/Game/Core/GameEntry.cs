@@ -35,6 +35,9 @@ namespace Game.Core
 
 		private void Awake()
 		{
+			QualitySettings.vSyncCount = 0;
+			Application.targetFrameRate = 60;
+			
 			var gameConfigData = new GameConfigData
 			{
 				RowsCount = gameConfig.rowsCount,

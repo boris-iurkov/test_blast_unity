@@ -1,6 +1,5 @@
 using System;
 using Game.Model;
-using UnityEngine;
 
 namespace Game.Controller.Controllers
 {
@@ -15,9 +14,6 @@ namespace Game.Controller.Controllers
 
 		public void OnTileClicked(TileModel tile)
 		{
-			QualitySettings.vSyncCount = 0;
-			Application.targetFrameRate = 60;
-			
 			if (FirstSelected == null)
 			{
 				FirstSelected = tile;
