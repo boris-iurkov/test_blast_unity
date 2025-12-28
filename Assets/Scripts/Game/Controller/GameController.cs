@@ -24,16 +24,12 @@ namespace Game.Controller
 		private BoosterBombCounter _boosterBomb;
 
 		private GameFieldView _gameFieldView;
-		private BoosterPanelView _boosterSwapView;
-		private BoosterPanelView _boosterBombView;
 		private EndGamePopup _endGamePopup;
 		
-		private BoosterSwapController _boosterSwapController;
+		private BoosterController _boosterController;
 		private ViewController _viewController;
 		private ShuffleController _shuffleController;
 		private EndGameController _endGameController;
-
-		private InteractionMode _interactionMode = InteractionMode.Common;
 		private SuperTileFactory _superTileFactory;
 
 		public void Init(
@@ -65,15 +61,6 @@ namespace Game.Controller
 			
 			_gameFieldView.OnTileClickRequested += HandleTileClick;
 			_gameFieldView.FallCompleted += HandleFallCompleted;
-			_gameFieldView.SwapTilesCompleted += HandleSwapTilesCompleted;
-
-			_boosterSwapView = boosterSwapView;
-			_boosterSwapView.Init();
-			_boosterSwapView.OnBoosterClicked += HandleBoosterSwapClicked;
-			
-			_boosterBombView = boosterBombView;
-			_boosterBombView.Init();
-			_boosterBombView.OnBoosterClicked += HandleBoosterBombClicked;
 
 			_endGamePopup = endGamePopup;
 
@@ -94,49 +81,51 @@ namespace Game.Controller
 
 			_boosterSwap = new BoosterCounter();
 			_boosterSwap.Init(gameConfigData.BoosterSwapStartCount);
-			_boosterSwap.OnBoosterUsed += HandleBoosterSwapUsed;
 
 			_boosterBomb = new BoosterBombCounter();
 			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
-			_boosterBomb.OnBoosterUsed += HandleBoosterBombUsed;
 
 			_superTileFactory = new SuperTileFactory();
 
-			_boosterSwapController = new BoosterSwapController();
-			_boosterSwapController.OnTileSelected += HandleTileSelected;
-			_boosterSwapController.OnTileUnselected += HandleTileUnselected;
-
 			_viewController = new ViewController();
 			_viewController.Init(movesView, scoreView, boosterSwapView, boosterBombView, _movesCounter, _scoreCounter, _boosterSwap, _boosterBomb);
+
+			_boosterController = new BoosterController();
+			_boosterController.Init(_boosterSwap, _boosterBomb, boosterSwapView, boosterBombView, _gameFieldView, _gameField, _viewController);
+			_gameFieldView.SwapTilesCompleted += _boosterController.HandleSwapTilesCompleted;
+
 			_viewController.UpdateAllViews();
+			_boosterController.UpdateViews();
 		}
 
 		private void HandleTileClick(int row, int column)
 		{
 			if (_endGameController.IsEndGame
 			    || _shuffleController.IsShuffling
-			    || _boosterSwapController.IsSwapping
+			    || _boosterController.BoosterSwapController.IsSwapping
 			    || _gameFieldView.IsTileFalling(row, column))
 				return;
 
+			if (_boosterController.InteractionMode == InteractionMode.BoosterSwap)
+			{
+				TileModel tile = _gameField.Tiles[row, column];
+				if (tile != null)
+					_boosterController.BoosterSwapController.OnTileClicked(tile);
+				return;
+			}
+
 			bool isSuperTile = _gameField.Tiles[row, column].SuperLogic != null;
 			List<Vector2Int> group;
-			switch (_interactionMode)
+			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
 			{
-				case InteractionMode.BoosterSwap:
-					_boosterSwapController.OnTileClicked(_gameField.Tiles[row, column]);
-					return;
-
-				case InteractionMode.BoosterBomb:
-					group = _gameField.GetBoosterBombTileGroup(row, column, _boosterBomb.Radius);
-					break;
-				
-				default:
-					if (isSuperTile)
-						group = _gameField.GetSuperTileGroup(row, column);
-					else
-						group = _gameField.GetCommonTileGroup(row, column);
-					break;
+				group = _gameField.GetBoosterBombTileGroup(row, column, _boosterController.BoosterBomb.Radius);
+			}
+			else
+			{
+				if (isSuperTile)
+					group = _gameField.GetSuperTileGroup(row, column);
+				else
+					group = _gameField.GetCommonTileGroup(row, column);
 			}
 
 			var groupWithoutFallingTiles = new List<Vector2Int>();
@@ -148,7 +137,7 @@ namespace Game.Controller
 			group = groupWithoutFallingTiles;
 			int groupCount = group.Count;
 
-			if (_interactionMode == InteractionMode.Common)
+			if (_boosterController.InteractionMode == InteractionMode.Common)
 			{
 				if (groupCount < 2)
 					return;
@@ -174,7 +163,7 @@ namespace Game.Controller
 				_gameFieldView.FallTiles(fallingTiles);
 			});
 
-			if (_interactionMode == InteractionMode.BoosterBomb)
+			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
 				_scoreCounter.AddScoreForBomb(groupCount);
 			else
 			{
@@ -185,12 +174,10 @@ namespace Game.Controller
 			}
 			_movesCounter.MakeMove();
 			
-			if (_interactionMode == InteractionMode.BoosterBomb)
-				_boosterBomb.Use();
+			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
+				_boosterController.BoosterBomb.Use();
 
-			_interactionMode = InteractionMode.Common;
-			
-			UpdateSelectionsByInteractionMode();
+			_boosterController.Reset();
 		}
 
 		private List<Vector2Int> ActivateSuperTilesInGroup(List<Vector2Int> group)
@@ -227,105 +214,6 @@ namespace Game.Controller
 			_endGameController.TryEndGame();
 		}
 		
-		private void HandleBoosterSwapClicked()
-		{
-			if (_boosterSwap.Count <= 0)
-				return;
-			
-			_interactionMode = _interactionMode != InteractionMode.BoosterSwap
-				? InteractionMode.BoosterSwap
-				: InteractionMode.Common;
-
-			UpdateSelectionsByInteractionMode();
-		}
-		
-		private void HandleBoosterSwapUsed()
-		{
-			_viewController.UpdateBoosterSwapView();
-		}
-
-		private void HandleBoosterBombClicked()
-		{
-			if (_boosterBomb.Count <= 0)
-				return;
-			
-			_interactionMode = _interactionMode != InteractionMode.BoosterBomb
-				? InteractionMode.BoosterBomb
-				: InteractionMode.Common;
-			
-			UpdateSelectionsByInteractionMode();
-		}
-		
-		private void HandleBoosterBombUsed()
-		{
-			_viewController.UpdateBoosterBombView();
-		}
-
-		private void UpdateSelectionsByInteractionMode()
-		{
-			switch (_interactionMode)
-			{
-				case InteractionMode.BoosterSwap:
-					_viewController.UpdateBoosterSwapSelection(true);
-					_viewController.UpdateBoosterBombSelection(false);
-					break;
-				
-				case InteractionMode.BoosterBomb:
-					_viewController.UpdateBoosterSwapSelection(false);
-					_viewController.UpdateBoosterBombSelection(true);
-					break;
-				
-				default:
-					_viewController.UpdateBoosterSwapSelection(false);
-					_viewController.UpdateBoosterBombSelection(false);
-					break;
-			}
-			
-			if (_interactionMode != InteractionMode.BoosterSwap)
-			{
-				TileModel firstTile = _boosterSwapController.FirstSelected;
-				if (firstTile != null)
-					_gameFieldView.UnselectTile(firstTile);
-				_boosterSwapController.Reset();
-			}
-		}
-
-		private void HandleTileSelected(TileModel tile)
-		{
-			_gameFieldView.SelectTile(tile);
-			if (_boosterSwapController.SecondSelected != null)
-			{
-				TileModel firstTile = _boosterSwapController.FirstSelected;
-				TileModel secondTile = _boosterSwapController.SecondSelected;
-
-				_gameFieldView.UnselectTile(firstTile);
-				_gameFieldView.UnselectTile(secondTile);
-				
-				_gameFieldView.SwapTiles(firstTile, secondTile);
-				_gameField.SwapTiles(firstTile, secondTile);
-				
-				_boosterSwap.Use();
-			}
-		}
-		
-		private void HandleTileUnselected(TileModel tile)
-		{
-			_gameFieldView.UnselectTile(tile);
-		}
-
-		private void HandleSwapTilesCompleted()
-		{
-			_gameFieldView.UpdateTileLayers(_boosterSwapController.FirstSelected, _boosterSwapController.SecondSelected);
-			
-			_boosterSwapController.Reset();
-
-			TileColor[,] colors = _gameFieldView.GetCurrentTileColors();
-			_gameField.SetColors(colors);
-			
-			_boosterSwapController.Reset();
-			_interactionMode = InteractionMode.Common;
-			UpdateSelectionsByInteractionMode();
-		}
 
 		private void HandleFallCompleted()
 		{
@@ -340,12 +228,9 @@ namespace Game.Controller
 		{
 			DOTween.KillAll();
 			
-			_interactionMode = InteractionMode.Common;
-			_boosterSwapController.Reset();
 			_endGameController.Reset();
 			_shuffleController.Reset();
-			
-			_viewController.UnselectAllBoosters();
+			_boosterController.Reset();
 
 			_movesCounter.Init(_movesCounter.MaxMoves);
 			_scoreCounter.Init(_scoreCounter.TargetScore);
