@@ -1,17 +1,14 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using Game.Controller.Controllers;
-using Game.Controller.Data;
 using Game.Controller.Factory;
 using Game.Model;
 using Game.Model.Booster;
 using Game.Model.Data;
-using Game.Model.SuperTile;
 using Game.View;
 using Game.View.Data;
 using Game.View.Popup;
 using Game.View.Tile;
-using UnityEngine;
 
 namespace Game.Controller
 {
@@ -26,11 +23,11 @@ namespace Game.Controller
 		private GameFieldView _gameFieldView;
 		private EndGamePopup _endGamePopup;
 		
+		private TileInteractionController _tileInteractionController;
 		private BoosterController _boosterController;
 		private ViewController _viewController;
 		private ShuffleController _shuffleController;
 		private EndGameController _endGameController;
-		private SuperTileFactory _superTileFactory;
 
 		public void Init(
 			GameFieldView gameFieldView,
@@ -59,7 +56,8 @@ namespace Game.Controller
 			for (var column = 0; column < _gameField.ColumnsCount; column++)
 				_gameFieldView.FillTile(_gameField.Tiles[row, column]);
 			
-			_gameFieldView.OnTileClickRequested += HandleTileClick;
+			_gameFieldView.OnTileClickRequested += (row, column) => 
+				_tileInteractionController.HandleTileClick(row, column, _endGameController.IsEndGame, _shuffleController.IsShuffling);
 			_gameFieldView.FallCompleted += HandleFallCompleted;
 
 			_endGamePopup = endGamePopup;
@@ -85,8 +83,6 @@ namespace Game.Controller
 			_boosterBomb = new BoosterBombCounter();
 			_boosterBomb.Init(gameConfigData.BoosterBombStartCount, gameConfigData.BoosterBombRadius);
 
-			_superTileFactory = new SuperTileFactory();
-
 			_viewController = new ViewController();
 			_viewController.Init(movesView, scoreView, boosterSwapView, boosterBombView, _movesCounter, _scoreCounter, _boosterSwap, _boosterBomb);
 
@@ -94,113 +90,14 @@ namespace Game.Controller
 			_boosterController.Init(_boosterSwap, _boosterBomb, boosterSwapView, boosterBombView, _gameFieldView, _gameField, _viewController);
 			_gameFieldView.SwapTilesCompleted += _boosterController.HandleSwapTilesCompleted;
 
+			var superTileFactory = new SuperTileFactory();
+			_tileInteractionController = new TileInteractionController();
+			_tileInteractionController.Init(_gameField, _gameFieldView, _scoreCounter, _movesCounter, _boosterController, superTileFactory);
+
 			_viewController.UpdateAllViews();
 			_boosterController.UpdateViews();
 		}
 
-		private void HandleTileClick(int row, int column)
-		{
-			if (_endGameController.IsEndGame
-			    || _shuffleController.IsShuffling
-			    || _boosterController.BoosterSwapController.IsSwapping
-			    || _gameFieldView.IsTileFalling(row, column))
-				return;
-
-			if (_boosterController.InteractionMode == InteractionMode.BoosterSwap)
-			{
-				TileModel tile = _gameField.Tiles[row, column];
-				if (tile != null)
-					_boosterController.BoosterSwapController.OnTileClicked(tile);
-				return;
-			}
-
-			bool isSuperTile = _gameField.Tiles[row, column].SuperLogic != null;
-			List<Vector2Int> group;
-			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
-			{
-				group = _gameField.GetBoosterBombTileGroup(row, column, _boosterController.BoosterBomb.Radius);
-			}
-			else
-			{
-				if (isSuperTile)
-					group = _gameField.GetSuperTileGroup(row, column);
-				else
-					group = _gameField.GetCommonTileGroup(row, column);
-			}
-
-			var groupWithoutFallingTiles = new List<Vector2Int>();
-			foreach (Vector2Int pos in group)
-			{
-				if (!_gameFieldView.IsTileFalling(pos.x, pos.y))
-					groupWithoutFallingTiles.Add(pos);
-			}
-			group = groupWithoutFallingTiles;
-			int groupCount = group.Count;
-
-			if (_boosterController.InteractionMode == InteractionMode.Common)
-			{
-				if (groupCount < 2)
-					return;
-
-				if (groupCount >= _gameField.MinSuperTileGroupSize && !isSuperTile)
-				{
-					group.RemoveAll(tile => tile.x == row && tile.y == column);
-					ISuperTileLogic superTileLogic = _superTileFactory.CreateRandomSuperTile();
-					_gameField.SetSuperTileLogic(row, column, superTileLogic);
-					_gameFieldView.UpdateTileView(row, column, _gameField.Tiles[row, column].Color);
-				}
-			}
-			
-			List<Vector2Int> finalGroup = ActivateSuperTilesInGroup(group);
-			
-			_gameField.RemoveTileGroup(finalGroup);
-			_gameFieldView.RemoveTileGroup(finalGroup, row, column);
-
-			float destroyDuration = _gameFieldView.GetDestroyGroupDuration(finalGroup, new Vector2Int(row, column), 0.05f);
-			DOVirtual.DelayedCall(destroyDuration, () =>
-			{
-				List<TileFallData> fallingTiles = _gameField.ApplyFallTiles();
-				_gameFieldView.FallTiles(fallingTiles);
-			});
-
-			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
-				_scoreCounter.AddScoreForBomb(groupCount);
-			else
-			{
-				if (isSuperTile)
-					_scoreCounter.AddScoreForSuperTile(groupCount);
-				else
-					_scoreCounter.AddScoreForGroup(groupCount);
-			}
-			_movesCounter.MakeMove();
-			
-			if (_boosterController.InteractionMode == InteractionMode.BoosterBomb)
-				_boosterController.BoosterBomb.Use();
-
-			_boosterController.Reset();
-		}
-
-		private List<Vector2Int> ActivateSuperTilesInGroup(List<Vector2Int> group)
-		{
-			var finalGroup = new HashSet<Vector2Int>(group);
-			
-			var superTilesToActivate = new List<Vector2Int>();
-			foreach (Vector2Int pos in group)
-			{
-				TileModel tile = _gameField.Tiles[pos.x, pos.y];
-				if (tile != null && tile.SuperLogic != null)
-					superTilesToActivate.Add(pos);
-			}
-			
-			foreach (Vector2Int superTilePos in superTilesToActivate)
-			{
-				List<Vector2Int> superTileGroup = _gameField.GetSuperTileGroup(superTilePos.x, superTilePos.y);
-				foreach (Vector2Int affectedPos in superTileGroup)
-					finalGroup.Add(affectedPos);
-			}
-			
-			return new List<Vector2Int>(finalGroup);
-		}
 
 		private void HandleMovesChanged()
 		{
