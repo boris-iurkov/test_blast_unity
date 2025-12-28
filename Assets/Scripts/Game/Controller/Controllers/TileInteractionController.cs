@@ -17,7 +17,7 @@ namespace Game.Controller.Controllers
 		private IScoreCounter _scoreCounter;
 		private IMovesCounter _movesCounter;
 		private IBoosterController _boosterController;
-		private SuperTileFactory _superTileFactory;
+		private ISuperTileFactory _superTileFactory;
 
 		public void Init(
 			IGameField gameField,
@@ -25,7 +25,7 @@ namespace Game.Controller.Controllers
 			IScoreCounter scoreCounter,
 			IMovesCounter movesCounter,
 			IBoosterController boosterController,
-			SuperTileFactory superTileFactory)
+			ISuperTileFactory superTileFactory)
 		{
 			_gameField = gameField;
 			_gameFieldView = gameFieldView;

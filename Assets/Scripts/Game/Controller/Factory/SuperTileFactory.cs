@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Controller.Factory
 {
-	public class SuperTileFactory
+	public class SuperTileFactory : ISuperTileFactory
 	{
 		public ISuperTileLogic CreateRandomSuperTile()
 		{
