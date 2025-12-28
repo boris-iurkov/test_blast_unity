@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Game.View
 {
-	public class BoosterPanelView : MonoBehaviour
+	public class BoosterPanelView : MonoBehaviour, IBoosterPanelView
 	{
 		[SerializeField] private Button button;
 		[SerializeField] private TextMeshProUGUI labelCount;

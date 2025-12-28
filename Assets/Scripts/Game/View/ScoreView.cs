@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.View
 {
-	public class ScoreView : MonoBehaviour
+	public class ScoreView : MonoBehaviour, IScoreView
 	{
 		[SerializeField] private TextMeshProUGUI labelCount;
 		

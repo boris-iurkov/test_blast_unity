@@ -6,10 +6,10 @@ namespace Game.Controller.Controllers
 {
 	public class ViewController : IViewController
 	{
-		private MovesView _movesView;
-		private ScoreView _scoreView;
-		private BoosterPanelView _boosterSwapView;
-		private BoosterPanelView _boosterBombView;
+		private IMovesView _movesView;
+		private IScoreView _scoreView;
+		private IBoosterPanelView _boosterSwapView;
+		private IBoosterPanelView _boosterBombView;
 		
 		private IMovesCounter _movesCounter;
 		private IScoreCounter _scoreCounter;
@@ -17,10 +17,10 @@ namespace Game.Controller.Controllers
 		private IBoosterBombCounter _boosterBomb;
 
 		public void Init(
-			MovesView movesView,
-			ScoreView scoreView,
-			BoosterPanelView boosterSwapView,
-			BoosterPanelView boosterBombView,
+			IMovesView movesView,
+			IScoreView scoreView,
+			IBoosterPanelView boosterSwapView,
+			IBoosterPanelView boosterBombView,
 			IMovesCounter movesCounter,
 			IScoreCounter scoreCounter,
 			IBoosterCounter boosterSwap,

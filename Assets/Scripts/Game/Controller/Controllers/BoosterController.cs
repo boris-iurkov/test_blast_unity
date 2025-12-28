@@ -13,8 +13,8 @@ namespace Game.Controller.Controllers
 		public IBoosterBombCounter BoosterBomb { get; private set; }
 
 		private IBoosterCounter _boosterSwap;
-		private BoosterPanelView _boosterSwapView;
-		private BoosterPanelView _boosterBombView;
+		private IBoosterPanelView _boosterSwapView;
+		private IBoosterPanelView _boosterBombView;
 		private IGameFieldView _gameFieldView;
 		private IGameField _gameField;
 		private IViewController _viewController;
@@ -22,8 +22,8 @@ namespace Game.Controller.Controllers
 		public void Init(
 			IBoosterCounter boosterSwap,
 			IBoosterBombCounter boosterBomb,
-			BoosterPanelView boosterSwapView,
-			BoosterPanelView boosterBombView,
+			IBoosterPanelView boosterSwapView,
+			IBoosterPanelView boosterBombView,
 			IGameFieldView gameFieldView,
 			IGameField gameField,
 			IViewController viewController,
