@@ -12,6 +12,7 @@ namespace Game.Model
 		private readonly GroupFinder _groupFinder = new();
 		private readonly TileFallCalculator _tileFallCalculator = new();
 		private readonly TileSpawner _tileSpawner = new();
+		private readonly TileFieldManager _tileFieldManager = new();
 
 		public TileModel[,] Tiles => _tiles;
 		public int RowsCount { get; private set; }
@@ -27,6 +28,8 @@ namespace Game.Model
 			RadiusSuperTileBombSmall = configData.RadiusSuperTileBombSmall;
 			
 			_tiles = new TileModel[RowsCount, ColumnsCount];
+			
+			_tileFieldManager.Init(_tiles, _pool, RowsCount, ColumnsCount);
 			
 			_tileSpawner.Init(_pool, _tiles, RowsCount, ColumnsCount);
 			_tileSpawner.SpawnStartTiles();
@@ -53,15 +56,7 @@ namespace Game.Model
 
 		public void RemoveTileGroup(List<Vector2Int> group)
 		{
-			foreach (Vector2Int positions in group)
-			{
-				TileModel tile = _tiles[positions.x, positions.y];
-				if (tile != null)
-				{
-					_pool.ReturnTile(tile);
-					_tiles[positions.x, positions.y] = null;
-				}
-			}
+			_tileFieldManager.RemoveTileGroup(group);
 		}
 
 		public List<TileFallData> ApplyFallTiles()
@@ -97,46 +92,22 @@ namespace Game.Model
 
 		public void SetColors(TileColor[,] colors)
 		{
-			for (var row = 0; row < RowsCount; row++)
-			for (var column = 0; column < ColumnsCount; column++)
-				_tiles[row, column].SetColor(colors[row, column]);
+			_tileFieldManager.SetColors(colors);
 		}
 
 		public void SwapTiles(TileModel tile1, TileModel tile2)
 		{
-			int row1 = tile1.Row;
-			int column1 = tile1.Column;
-			int row2 = tile2.Row;
-			int column2 = tile2.Column;
-			
-			TileModel firstTile = _tiles[row1, column1];
-			TileModel secondTile = _tiles[row2, column2];
-			
-			(_tiles[row1, column1], _tiles[row2, column2]) = (_tiles[row2, column2], _tiles[row1, column1]);
-			
-			firstTile.SetPositions(row2, column2);
-			secondTile.SetPositions(row1, column1);
+			_tileFieldManager.SwapTiles(tile1, tile2);
 		}
 
 		public void SetSuperTileLogic(int row, int column, ISuperTileLogic superTileLogic)
 		{
-			TileModel tile = _tiles[row, column];
-			tile.SetSuperTileLogic(superTileLogic);
-			tile.SetColor(superTileLogic.TileColor);
+			_tileFieldManager.SetSuperTileLogic(row, column, superTileLogic);
 		}
 
 		public void Reset()
 		{
-			for (var row = 0; row < RowsCount; row++)
-			for (var column = 0; column < ColumnsCount; column++)
-			{
-				if (_tiles[row, column] != null)
-				{
-					_pool.ReturnTile(_tiles[row, column]);
-					_tiles[row, column] = null;
-				}
-			}
-			
+			_tileFieldManager.ClearAllTiles();
 			_tileSpawner.SpawnStartTiles();
 			_groupFinder.Init(_tiles, RowsCount, ColumnsCount, RadiusSuperTileBombSmall);
 			_tileFallCalculator.Init(_tiles, RowsCount, ColumnsCount);
