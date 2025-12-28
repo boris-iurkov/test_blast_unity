@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using Game.Controller.Data;
+using Game.Controller.Factory;
 using Game.Model;
 using Game.Model.Booster;
 using Game.Model.Data;
@@ -37,6 +38,7 @@ namespace Game.Controller
 
 		private InteractionMode _interactionMode = InteractionMode.Common;
 		private BoosterSwapController _boosterSwapController;
+		private SuperTileFactory _superTileFactory;
 
 		public void Init(
 			GameFieldView gameFieldView,
@@ -103,6 +105,8 @@ namespace Game.Controller
 
 			_maxShuffles = gameConfigData.MaxShuffles;
 
+			_superTileFactory = new SuperTileFactory();
+
 			_boosterSwapController = new BoosterSwapController();
 			_boosterSwapController.OnTileSelected += HandleTileSelected;
 			_boosterSwapController.OnTileUnselected += HandleTileUnselected;
@@ -158,7 +162,7 @@ namespace Game.Controller
 				if (groupCount >= _gameField.MinSuperTileGroupSize && !isSuperTile)
 				{
 					group.RemoveAll(tile => tile.x == row && tile.y == column);
-					ISuperTileLogic superTileLogic = GetRandomSuperTileLogic();
+					ISuperTileLogic superTileLogic = _superTileFactory.CreateRandomSuperTile();
 					_gameField.SetSuperTileLogic(row, column, superTileLogic);
 					_gameFieldView.UpdateTileView(row, column, _gameField.Tiles[row, column].Color);
 				}
@@ -215,25 +219,6 @@ namespace Game.Controller
 			}
 			
 			return new List<Vector2Int>(finalGroup);
-		}
-
-		private ISuperTileLogic GetRandomSuperTileLogic()
-		{
-			int rnd = Random.Range(1, 5);
-			switch (rnd)
-			{
-				case 1:
-					return new SuperTileLogicRow();
-				
-				case 2:
-					return new SuperTileLogicColumn();
-				
-				case 3:
-					return new SuperTileLogicExplodeSmall();
-
-				default:
-					return new SuperTileLogicExplodeBig();
-			}
 		}
 
 		private void HandleMovesChanged()
