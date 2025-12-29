@@ -16,5 +16,7 @@
 - настроек для логики начисления очков нет, можно только поменять целевое кол-во очков в GameConfig.
 - cцена для запуска: Assets -> Scenes -> MainScene
 
+### GitHub Pages:
+- Попробовать на GitHub Pages можно [здесь](https://boris-iurkov.github.io/test_blast_unity/)
 
 Сделано в версии Unity 6000.2.9f1
